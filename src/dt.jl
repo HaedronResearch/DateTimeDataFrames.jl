@@ -12,7 +12,8 @@ function dtr(start::DateTime, stop::DateTime, s::Dates.Period=Dates.Hour(1))
 	start:s:stop+s
 end
 
-function dtr(df::AbstractDataFrame, s::Dates.Period=Dates.Hour(1); index::Symbol=DT_INDEX)
+function dtr(df::AbstractDataFrame, s::Dates.Period=Dates.Hour(1);
+	index::Symbol=DT_INDEX)
 	dtr(df[begin, index], df[end, index], s)
 end
 
@@ -22,7 +23,7 @@ Select a DataFrame subinterval by start and stop points.
 """
 function sub(df::AbstractDataFrame, start, stop;
 	index::Symbol=DT_INDEX)
-	df[DateTime(start) .< df[:, index] .< DateTime(stop) :]
+	df[DateTime(start) .< df[:, index] .< DateTime(stop), :]
 end
 
 """
