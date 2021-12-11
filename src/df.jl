@@ -35,6 +35,7 @@ Aggregate over sequential subsets demarcated by true values.
 Can be used to aggregate custom bars.
 """
 function agg(df::AbstractDataFrame, set::BitVector; index::Symbol=DEF_INDEX)
+	df = copy(df; copycols=true)
 	df[!, :bar] = cumsum(set)
 	groupby(df, :bar)
 end
