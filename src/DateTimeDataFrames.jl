@@ -1,6 +1,6 @@
 module DateTimeDataFrames
 
-export DT_INDEX, sub, agg
+export DT_INDEX, sub, agg, shift!
 
 include("df.jl")
 include("dt.jl")

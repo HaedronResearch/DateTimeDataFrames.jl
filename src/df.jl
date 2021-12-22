@@ -54,7 +54,8 @@ The end slots are filled with the last observation.
 `s` must be a positive integer
 """
 function lead!(vec::Vector{T}, s::Integer) where T
-	push!(vec[begin+s:end], fill(vec[end], s))
+	@assert s > 0
+	append!(vec[begin+s:end], fill(vec[end], s))
 end
 
 """
@@ -63,7 +64,8 @@ The beginning slots are filled with the first observation.
 `s` must be a negative integer
 """
 function lag!(vec::Vector{T}, s::Integer) where T
-	insert!(vec[begin:end+s], fill(vec[begin], abs(s)))
+	@assert s < 0
+	prepend!(vec[begin:end+s], fill(vec[begin], abs(s)))
 end
 
 """
