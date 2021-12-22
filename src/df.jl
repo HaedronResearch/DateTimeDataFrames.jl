@@ -49,9 +49,39 @@ function agg(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX)
 end
 
 """
+Shift vector to next sth slot.
+The end slots are filled with the last observation.
+`s` must be a positive integer
+"""
+function lead!(vec::Vector{T}, s::Integer) where T
+	push!(vec[begin+s:end], fill(vec[end], s))
+end
+
+"""
+Shift vector to the previous -sth slot.
+The beginning slots are filled with the first observation.
+`s` must be a negative integer
+"""
+function lag!(vec::Vector{T}, s::Integer) where T
+	insert!(vec[begin:end+s], fill(vec[begin], abs(s)))
+end
+
+"""
+Shift vector.
+Use first or last seen observation to fill adjacent slots that have been shifted off.
+"""
+function shift!(vec::Vector{T}, s::Integer) where T
+	if s > 0
+		lead!(vec, s)
+	elseif s < 0
+		lag!(vec, s)
+	end
+end
+
+"""
 Return a random DataFrame indexed by `idx`.
 """
-function getdf_rand(idx::Vector, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=rand)
+function getdf_rand(idx::Vector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=rand) where T
 	val = randfn(size(idx)[1], ncol-1)
 	df = DataFrame(hcat(idx, val), :auto)
 	rename!(df, 1=>index)

@@ -1,8 +1,9 @@
 # DateTimeDataFrames.jl
 
+Simple DataFrame Time Series.
 Simple verbs for working with DateTime indexed DataFrames.
 
-Contains common time series functionality including:
+Contains simple verbs for time series functionality including:
 * subset
 * subsample
 * aggregate
