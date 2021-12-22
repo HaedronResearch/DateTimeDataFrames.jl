@@ -81,6 +81,20 @@ function shift!(vec::Vector{T}, s::Integer) where T
 end
 
 """
+Shift DataFrame
+Use first or last seen observation to fill adjacent slots that have been shifted off.
+"""
+function shift!(df::AbstractDataFrame, s::Integer; index::Symbol=DEF_INDEX)
+	if s > 0
+		df[!, index] = lead!(df[:, index], s)
+		df[begin:end+s, :]
+	elseif s < 0
+		df[!, index] = lag!(df[:, index], s)
+		df[begin+s:end, :]
+	end
+end
+
+"""
 Return a random DataFrame indexed by `idx`.
 """
 function getdf_rand(idx::Vector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=rand) where T
