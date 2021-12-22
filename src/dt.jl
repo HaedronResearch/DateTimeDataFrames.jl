@@ -48,6 +48,20 @@ function agg(df::AbstractDataFrame, s::Dates.Period=Dates.Hour(1);
 end
 
 """
+Shift DataFrame by moving index up or down.
+Use first or last seen observation to fill adjacent slots that have been shifted off.
+"""
+function shift!(df::AbstractDataFrame, s::Integer; index::Symbol=DT_INDEX)
+	if s > 0
+		df[!, index] = lead!(df[:, index], s)
+		df[begin:end+s, :]
+	elseif s < 0
+		df[!, index] = lag!(df[:, index], s)
+		df[begin+abs(s):end, :]
+	end
+end
+
+"""
 Return a random DataFrame indexed by a DateTime range.
 """
 function getdf_rand(start::DateTime, stop::DateTime, s::Dates.Period=Dates.Hour(1);
