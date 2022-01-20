@@ -4,12 +4,13 @@ using DataFrames
 General
 """
 const DEF_INDEX = :index
+const AGG_COL = :bar
 
 """
 inr(ange)
 Decently fast StepRange boolean indexer.
 """
-function inr(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX)
+function inr(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX)::BitVector
 	∈(r).(df[:, index])
 end
 
@@ -34,18 +35,18 @@ agg(regate)
 Aggregate over sequential subsets demarcated by true values.
 Can be used to aggregate custom bars.
 """
-function agg(df::AbstractDataFrame, set::BitVector; index::Symbol=DEF_INDEX)
+function agg(df::AbstractDataFrame, set::BitVector; index::Symbol=DEF_INDEX, col::Symbol=AGG_COL)
 	df = copy(df; copycols=true)
-	df[!, :bar] = cumsum(set)
-	groupby(df, :bar)
+	df[!, col] = cumsum(set)
+	groupby(df, col)
 end
 
 """
 agg(regate)
 Aggregate over subrange groups.
 """
-function agg(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX)
-	agg(df, inr(df, r; index=index); index=index)
+function agg(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX, col::Symbol=AGG_COL)
+	agg(df, inr(df, r; index=index); index=index, col=col)
 end
 
 """
@@ -53,17 +54,17 @@ Shift vector to next sth slot.
 The end slots are filled with the last observation.
 `s` must be a positive integer
 """
-function lead!(vec::Vector{T}, s::Integer) where T
+function lead!(vec::AbstractVector{T}, s::Integer) where T
 	@assert s > 0
 	append!(vec[begin+s:end], fill(vec[end], s))
 end
 
 """
-Shift vector to the previous -sth slot.
+Shift vector to the previous sth slot.
 The beginning slots are filled with the first observation.
 `s` must be a negative integer
 """
-function lag!(vec::Vector{T}, s::Integer) where T
+function lag!(vec::AbstractVector{T}, s::Integer) where T
 	@assert s < 0
 	prepend!(vec[begin:end+s], fill(vec[begin], abs(s)))
 end
@@ -72,7 +73,7 @@ end
 Shift vector.
 Use first or last seen observation to fill adjacent slots that have been shifted off.
 """
-function shift!(vec::Vector{T}, s::Integer) where T
+function shift!(vec::AbstractVector{T}, s::Integer) where T
 	if s > 0
 		lead!(vec, s)
 	elseif s < 0
@@ -83,7 +84,7 @@ end
 """
 Return a random DataFrame indexed by `idx`.
 """
-function getdf_rand(idx::Vector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=rand) where T
+function getdf_rand(idx::AbstractVector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=rand) where T
 	val = randfn(size(idx)[1], ncol-1)
 	df = DataFrame(hcat(idx, val), :auto)
 	rename!(df, 1=>index)
