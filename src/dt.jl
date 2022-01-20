@@ -59,7 +59,6 @@ function shift!(df::AbstractDataFrame, s::Integer; index::Symbol=DT_INDEX)
 		df[!, index] = lag!(df[:, index], s)
 		df[begin+abs(s):end, :]
 	end
-	df
 end
 
 shift(df::AbstractDataFrame, s::Integer; index::Symbol=DT_INDEX) = shift!(copy(df), s; index=index)
