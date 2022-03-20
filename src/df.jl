@@ -10,25 +10,19 @@ const AGG_COL = :bar
 inr(ange)
 Decently fast StepRange boolean indexer.
 """
-function inr(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX)::BitVector
-	∈(r).(df[:, index])
-end
+@inline inr(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX) = ∈(r).(df[:, index])
 
 """
 sub(set)
 Select DataFrame subset by boolean indexing.
 """
-function sub(df::AbstractDataFrame, set::BitVector)
-	df[set, :]
-end
+@inline sub(df::AbstractDataFrame, set::BitVector) = df[set, :]
 
 """
 sub(set)
 Select DataFrame subrange (subset in range) by `index` column values in `r`.
 """
-function sub(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX)
-	sub(df, inr(df, r; index=index))
-end
+@inline sub(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX) = sub(df, inr(df, r; index=index))
 
 """
 agg(regate)
@@ -84,7 +78,7 @@ end
 """
 Return a random DataFrame indexed by `idx`.
 """
-function getdf_rand(idx::AbstractVector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=rand) where T
+function randdf(idx::AbstractVector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=rand) where T
 	val = randfn(size(idx)[1], ncol-1)
 	df = DataFrame(hcat(idx, val), :auto)
 	rename!(df, 1=>index)
