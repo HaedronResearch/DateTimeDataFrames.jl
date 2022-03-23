@@ -23,7 +23,13 @@ DateTime range
 sub(set)
 Select a DataFrame subinterval by start and stop points.
 """
-@inline sub(df::AbstractDataFrame, start, stop; index::Symbol=DT_INDEX) = df[DateTime(start) .<= df[:, index] .< DateTime(stop), :]
+@inline sub(df::AbstractDataFrame, start::Dates.DateTime, stop::Dates.DateTime; index::Symbol=DT_INDEX) = df[start .<= df[:, index] .< stop, :]
+
+"""
+sub(set)
+Select a DataFrame subinterval by start and stop points.
+"""
+@inline sub(df::AbstractDataFrame, start, stop; index::Symbol=DT_INDEX) = sub(df, Dates.DateTime(start), Dates.DateTime(stop); index=index)
 
 """
 sub(set)
