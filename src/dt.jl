@@ -15,7 +15,7 @@ end
 """
 DateTime range
 """
-@inline dtr(start::DateTime, stop::DateTime, τ::Dates.Period=DT_PERIOD) = start:τ:stop+τ
+@inline dtr(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period=DT_PERIOD) = start:τ:stop+τ
 
 @inline dtr(df::AbstractDataFrame, τ::Dates.Period=DT_PERIOD; index::Symbol=DT_INDEX) = dtr(df[begin, index], df[end, index], τ)
 
@@ -83,7 +83,7 @@ end
 """
 Return a random DataFrame indexed by a DateTime range.
 """
-function randdf(start::DateTime, stop::DateTime, τ::Dates.Period=DT_PERIOD;
+function randdf(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period=DT_PERIOD;
 	ncol::Integer=4, index::Symbol=DT_INDEX, randfn=rand)
 	randdf(collect(dtr(start, stop, τ)), ncol; index=index, randfn=randfn)
 end
