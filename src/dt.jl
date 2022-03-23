@@ -79,11 +79,11 @@ Group a DataFrame using constructors mapped to the index.
 For example `groupby(df, [Year, Quarter])` groups into year quarter combinations.
 """
 function groupby(df::AbstractDataFrame, by::Vector{DataType}; index=DT_INDEX)
-	g = ["$(index)_$(b)" for b in by]
+	gcols = ["$(b)($(index))" for b in by]
 	for i in 1:length(by)
-		df[:, g[i]] = by[i].(df[:, index])
+		df[:, gcols[i]] = by[i].(df[:, index])
 	end
-	groupby(df, g)
+	groupby(df, gcols)
 end
 
 """
