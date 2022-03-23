@@ -7,6 +7,7 @@ Contains simple verbs for time series functionality including:
 * `agg()`regate
 * `shift!()`
 * `groupby()` (extensions)
+* cleaning functions: `cleave()`
 
 All operations work at arbitrary frequencies (time-based or irregular).
 

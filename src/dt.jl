@@ -87,6 +87,18 @@ function groupby(df::AbstractDataFrame, by::Vector{DataType}; index=DT_INDEX)
 end
 
 """
+Start the DataFrame from the start of the first full day to the end of the last full day, cleave off the rest.
+"""
+function cleave(df::AbstractDataFrame; index=DT_INDEX)
+	dti = df[:, index]
+	firstidx = findfirst(dt->Time(dt)==Time(0), dti)
+	lastidx = findlast(dt->Time(dt)==Time(0), dti)
+	firstday = df[firstidx, index]
+	lastday = df[lastidx, index]
+	sub(df, firstday, lastday)
+end
+
+"""
 Return a random DataFrame indexed by a DateTime range.
 """
 function randdf(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period=DT_PERIOD;
