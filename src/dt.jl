@@ -72,10 +72,10 @@ end
 Group a DataFrame a constructor mapped to the index.
 For example `groupby(df, Year)` groups into years.
 """
-groupby(df::AbstractDataFrame, by::DataType; index=DT_INDEX) = groupby(df, [by]; index=index)
+groupby(df::AbstractDataFrame, by::DataType; index::Symbol=DT_INDEX) = groupby(df, [by]; index=index)
 
 """
-Group a DataFrame using constructors mapped to the index.
+Group by a DataFrame using constructors mapped to the index.
 For example `groupby(df, [Year, Quarter])` groups into year quarter combinations.
 """
 function groupby(df::AbstractDataFrame, by::Vector{DataType}; index=DT_INDEX)
@@ -87,27 +87,33 @@ function groupby(df::AbstractDataFrame, by::Vector{DataType}; index=DT_INDEX)
 end
 
 """
-Start the DataFrame from the start of the first full day to the end of the last full day, cleave off the rest.
+Start the DataFrame from the first day with time `t₀` to the end of the lastg day with time `t₁`, cleave off the rest.
 """
-function cleave(df::AbstractDataFrame; index=DT_INDEX)
-	dti = df[:, index]
-	firstidx = findfirst(dt->Time(dt)==Time(0), dti)
-	lastidx = findlast(dt->Time(dt)==Time(0), dti)
-	firstday = df[firstidx, index]
-	lastday = df[lastidx, index]
-	sub(df, firstday, lastday)
+function cleave(df::AbstractDataFrame, t₀::Time, t₁::Time; index=DT_INDEX)
+	dti = df[!, index]
+	day₀ = df[findfirst(dt->Time(dt)==t₀, dti), index]
+	day₁ = df[findlast(dt->Time(dt)==t₁, dti), index]
+	sub(df, day₀, day₁)
 end
+
+"""
+Cleave from the first and last day with time `t`.
+"""
+@inline cleave(df::AbstractDataFrame, t::Time=Time(0); index=DT_INDEX) = cleave(df, t, t; index=index)
 
 """
 Return a random DataFrame indexed by a DateTime range.
 """
 function randdf(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period=DT_PERIOD;
-	ncol::Integer=4, index::Symbol=DT_INDEX, randfn=rand)
+	ncol::Integer=4, index::Symbol=DT_INDEX, randfn=randn)
 	randdf(collect(dtr(start, stop, τ)), ncol; index=index, randfn=randfn)
 end
 
+"""
+Return a random DataFrame indexed by a DateTime range; `offset` sets the lookback window from now.
+"""
 function randdf(offset::Dates.Period, τ::Dates.Period=DT_PERIOD;
-	ncol::Integer=4, index::Symbol=DT_INDEX, randfn=rand)
+	ncol::Integer=4, index::Symbol=DT_INDEX, randfn=randn)
 	stop = now()
 	randdf(stop-offset, stop, τ; ncol=ncol, index=index, randfn=randfn)
 end

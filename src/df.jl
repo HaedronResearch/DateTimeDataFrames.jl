@@ -6,11 +6,20 @@ General
 const DEF_INDEX = :index
 const AGG_COL = :bar
 
+@inline Vector{T}(gd::GroupedDataFrame) where T<:AbstractDataFrame = [convert(T, g) for g in gd]
+
 """
 inr(ange)
 Decently fast StepRange boolean indexer.
 """
 @inline inr(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX) = ∈(r).(df[:, index])
+
+"""
+in(range)
+Alternate method, returns integer indices (https://dm13450.github.io/2021/04/21/Accidentally-Quadratic.html).
+About the same speed as `inr`, although the difference may vary by the sparseness of the selection.
+"""
+@inline inr2(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX) = findall(∈(r), df[:, index])
 
 """
 sub(set)
@@ -78,8 +87,13 @@ end
 """
 Return a random DataFrame indexed by `idx`.
 """
-function randdf(idx::AbstractVector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=rand) where T
+function randdf(idx::AbstractVector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=randn) where T
 	val = randfn(size(idx)[1], ncol-1)
-	df = DataFrame(hcat(idx, val), :auto)
-	rename!(df, 1=>index)
+	hcat(DataFrame(index=>idx), DataFrame(val, :auto))
 end
+
+"""
+Sample `n` rows of a DataFrame.
+"""
+@inline sampledf(df::AbstractDataFrame, n::Integer) = df[rand(1:nrow(df), n), :]
+

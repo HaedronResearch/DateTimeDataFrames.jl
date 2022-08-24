@@ -1,6 +1,6 @@
 module DateTimeDataFrames
 
-export DT_INDEX, sub, agg, shift, shift!, cleave, randdf
+export DT_INDEX, sub, agg, shift, shift!, cleave, sampledf, randdf
 export groupby
 
 include("df.jl")
