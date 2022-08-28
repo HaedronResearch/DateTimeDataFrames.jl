@@ -3,8 +3,9 @@ using DataFrames
 """
 General
 """
-const DEF_INDEX = :index
-const AGG_COL = :bar
+const INDEX_DF = :index
+const AGG_DF = :bar
+const C = Union{Symbol, AbstractString, Integer} # single column getindex() identifier types
 
 @inline Vector{T}(gd::GroupedDataFrame) where T<:AbstractDataFrame = [convert(T, g) for g in gd]
 
@@ -12,14 +13,14 @@ const AGG_COL = :bar
 inr(ange)
 Decently fast StepRange boolean indexer.
 """
-@inline inr(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX) = ∈(r).(df[:, index])
+@inline inr(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF) = ∈(r).(df[:, index])
 
 """
 in(range)
 Alternate method, returns integer indices (https://dm13450.github.io/2021/04/21/Accidentally-Quadratic.html).
 About the same speed as `inr`, although the difference on memory and speed may vary by the sparseness of the selection.
 """
-@inline inr2(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX) = findall(∈(r), df[:, index])
+@inline inr2(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF) = findall(∈(r), df[:, index])
 
 """
 sub(set)
@@ -31,14 +32,14 @@ Select DataFrame subset by boolean indexing.
 sub(set)
 Select DataFrame subrange (subset in range) by `index` column values in `r`.
 """
-@inline sub(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX) = sub(df, inr(df, r; index=index))
+@inline sub(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF) = sub(df, inr(df, r; index=index))
 
 """
 agg(regate)
 Aggregate over sequential subsets demarcated by true values.
 Can be used to aggregate custom bars.
 """
-function agg(df::AbstractDataFrame, set::BitVector; index::Symbol=DEF_INDEX, col::Symbol=AGG_COL)
+function agg(df::AbstractDataFrame, set::BitVector; index::C=INDEX_DF, col::C=AGG_DF)
 	df = copy(df; copycols=true)
 	df[!, col] = cumsum(set)
 	groupby(df, col)
@@ -48,7 +49,7 @@ end
 agg(regate)
 Aggregate over subrange groups.
 """
-function agg(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX, col::Symbol=AGG_COL)
+function agg(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF, col::C=AGG_DF)
 	agg(df, inr(df, r; index=index); index=index, col=col)
 end
 
@@ -87,7 +88,7 @@ end
 """
 Return a random DataFrame indexed by `idx`.
 """
-function randdf(idx::AbstractVector{T}, ncol::Integer=4; index::Symbol=DEF_INDEX, randfn=randn) where T
+function randdf(idx::AbstractVector{T}, ncol::Integer=4; index::C=INDEX_DF, randfn=randn) where T
 	val = randfn(size(idx)[1], ncol-1)
 	hcat(DataFrame(index=>idx), DataFrame(val, :auto))
 end
