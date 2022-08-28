@@ -17,7 +17,7 @@ Decently fast StepRange boolean indexer.
 """
 in(range)
 Alternate method, returns integer indices (https://dm13450.github.io/2021/04/21/Accidentally-Quadratic.html).
-About the same speed as `inr`, although the difference may vary by the sparseness of the selection.
+About the same speed as `inr`, although the difference on memory and speed may vary by the sparseness of the selection.
 """
 @inline inr2(df::AbstractDataFrame, r::StepRange; index::Symbol=DEF_INDEX) = findall(∈(r), df[:, index])
 

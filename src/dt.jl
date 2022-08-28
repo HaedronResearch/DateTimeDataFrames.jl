@@ -15,15 +15,15 @@ end
 """
 DateTime range
 """
-@inline dtr(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period=DT_PERIOD) = start:τ:stop+τ
+@inline dtr(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period) = start:τ:stop
 
-@inline dtr(df::AbstractDataFrame, τ::Dates.Period=DT_PERIOD; index::Symbol=DT_INDEX) = dtr(df[begin, index], df[end, index], τ)
+@inline dtr(df::AbstractDataFrame, τ::Dates.Period; index::Symbol=DT_INDEX) = dtr(df[begin, index], df[end, index], τ)
 
 """
 sub(set)
 Select a DataFrame subinterval by start and stop points.
 """
-@inline sub(df::AbstractDataFrame, start::Dates.DateTime, stop::Dates.DateTime; index::Symbol=DT_INDEX) = df[start .<= df[:, index] .< stop, :]
+@inline sub(df::AbstractDataFrame, start::Dates.DateTime, stop::Dates.DateTime; index::Symbol=DT_INDEX) = df[start .<= df[:, index] .<= stop, :]
 
 """
 sub(set)
@@ -64,9 +64,7 @@ function shift!(df::AbstractDataFrame, s::Integer; index::Symbol=DT_INDEX)
 	end
 end
 
-function shift(df::AbstractDataFrame, s::Integer; index::Symbol=DT_INDEX)
-	shift!(copy(df), s; index=index)
-end
+@inline shift(df::AbstractDataFrame, s::Integer; index::Symbol=DT_INDEX) = shift!(copy(df), s; index=index)
 
 """
 Group a DataFrame a constructor mapped to the index.
@@ -87,12 +85,12 @@ function groupby(df::AbstractDataFrame, by::Vector{DataType}; index=DT_INDEX)
 end
 
 """
-Start the DataFrame from the first day with time `t₀` to the end of the lastg day with time `t₁`, cleave off the rest.
+Start the DataFrame from the first day with time `t₀` to the end of the last day with time `t₁`, cleave off the rest.
 """
 function cleave(df::AbstractDataFrame, t₀::Time, t₁::Time; index=DT_INDEX)
 	dti = df[!, index]
-	day₀ = df[findfirst(dt->Time(dt)==t₀, dti), index]
-	day₁ = df[findlast(dt->Time(dt)==t₁, dti), index]
+	day₀ = df[findfirst(dt->Time(dt)>=t₀, dti), index]
+	day₁ = df[findlast(dt->Time(dt)<=t₁, dti), index]
 	sub(df, day₀, day₁)
 end
 

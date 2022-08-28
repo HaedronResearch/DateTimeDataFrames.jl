@@ -1,6 +1,7 @@
 # DateTimeDataFrames.jl
 
 Simple verbs for working with DateTime indexed (time series) DataFrames.
+Intended to be small and [suckless](https://suckless.org/).
 
 Contains simple verbs for time series functionality including:
 * `sub()`{set, range}
@@ -9,5 +10,9 @@ Contains simple verbs for time series functionality including:
 * `groupby()` (extensions)
 * cleaning functions: `cleave()`
 
-All operations work at arbitrary frequencies (time-based or "irregular").
-The `DateTime` column is called `:datetime` by default, and is assumed to be sorted in ascending order.
+## Notes
+* Ranges follow Julia convention (inclusive at both ends).
+* All operations work at arbitrary frequencies (time-based or "irregular").
+* By default the index column is called `:datetime`.
+* The index column is assumed to be sorted in ascending order.
+
