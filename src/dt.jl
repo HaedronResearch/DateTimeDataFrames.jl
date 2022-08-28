@@ -52,19 +52,23 @@ end
 
 """
 Shift DataFrame by moving index up or down `abs(s)` steps.
-If `truncate` is false fill adjacent slots that have been shifted off, leaving the dataframe
+If `trunc` is false fill adjacent slots that have been shifted off, leaving the dataframe
 the same length.
 """
-function shift!(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT, truncate::Bool=true)
+function shift!(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT, trunc::Bool=true)
 	df[!, index] = shift!(df[:, index], s)
-	if s > 0
-		df[begin:end-s, :]
-	elseif s < 0
-		df[begin+abs(s):end, :]
+	if trunc
+		if s > 0
+			df[begin:end-s, :]
+		elseif s < 0
+			df[begin+abs(s):end, :]
+		end
+	else
+		df
 	end
 end
 
-@inline shift(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT) = shift!(copy(df), s; index=index)
+@inline shift(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT, trunc::Bool=true) = shift!(copy(df), s; index=index, trunc=trunc)
 
 """
 Group a DataFrame a constructor mapped to the index.
