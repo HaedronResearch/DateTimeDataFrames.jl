@@ -5,7 +5,8 @@ General
 """
 const INDEX_DF = :index
 const AGG_DF = :bar
-const C = Union{Symbol, AbstractString, Integer} # single column getindex() identifier types
+const CN = Union{Symbol, AbstractString}   # valid column name types
+const C = Union{CN, Integer}               # valid column getindex() identifier types
 
 @inline Vector{T}(gd::GroupedDataFrame) where T<:AbstractDataFrame = [convert(T, g) for g in gd]
 
@@ -39,7 +40,7 @@ agg(regate)
 Aggregate over sequential subsets demarcated by true values.
 Can be used to aggregate custom bars.
 """
-function agg(df::AbstractDataFrame, set::BitVector; index::C=INDEX_DF, col::C=AGG_DF)
+function agg(df::AbstractDataFrame, set::BitVector; index::C=INDEX_DF, col::CN=AGG_DF)
 	df = copy(df; copycols=true)
 	df[!, col] = cumsum(set)
 	groupby(df, col)
@@ -49,46 +50,26 @@ end
 agg(regate)
 Aggregate over subrange groups.
 """
-function agg(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF, col::C=AGG_DF)
-	agg(df, inr(df, r; index=index); index=index, col=col)
-end
+@inline agg(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF, col::CN=AGG_DF) = agg(df, inr(df, r; index=index); index=index, col=col)
 
 """
-Shift vector to next sth slot.
-The end slots are filled with the last observation.
-`s` must be a positive integer
-"""
-function lead!(vec::AbstractVector{T}, s::Integer) where T
-	@assert s > 0
-	append!(vec[begin+s:end], fill(vec[end], s))
-end
+Shift vector and use first/last seen observation to fill adjacent slots that have been shifted off.
 
-"""
-Shift vector to the previous sth slot.
-The beginning slots are filled with the first observation.
-`s` must be a negative integer
-"""
-function lag!(vec::AbstractVector{T}, s::Integer) where T
-	@assert s < 0
-	prepend!(vec[begin:end+s], fill(vec[begin], abs(s)))
-end
-
-"""
-Shift vector.
-Use first or last seen observation to fill adjacent slots that have been shifted off.
+If s > 0 -> shift vector to next sth slot, forward filling end slots.
+If s < 0 -> shift vector to previous sth slot, back filling beginning slots.
 """
 function shift!(vec::AbstractVector{T}, s::Integer) where T
 	if s > 0
-		lead!(vec, s)
+		append!(vec[begin+s:end], fill(vec[end], s))
 	elseif s < 0
-		lag!(vec, s)
+		prepend!(vec[begin:end+s], fill(vec[begin], abs(s)))
 	end
 end
 
 """
 Return a random DataFrame indexed by `idx`.
 """
-function randdf(idx::AbstractVector{T}, ncol::Integer=4; index::C=INDEX_DF, randfn=randn) where T
+function randdf(idx::AbstractVector{T}, ncol::Integer=5; index::CN=INDEX_DF, randfn=randn) where T
 	val = randfn(size(idx)[1], ncol-1)
 	hcat(DataFrame(index=>idx), DataFrame(val, :auto))
 end

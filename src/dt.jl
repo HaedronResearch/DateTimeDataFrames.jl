@@ -44,7 +44,7 @@ agg(regate)
 Aggregate over subrange groups by DateTime `index` column values in `τ` Period.
 Can be used to aggregate abritrary time bars.
 """
-function agg(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT, col::C=AGG_DT)
+function agg(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT, col::CN=AGG_DT)
 	df = copy(df; copycols=true)
 	df[!, col] = floor.(df[!, index], τ)
 	groupby(df, col)
@@ -52,14 +52,14 @@ end
 
 """
 Shift DataFrame by moving index up or down `abs(s)` steps.
-Use first or last seen observation to fill adjacent slots that have been shifted off.
+If `truncate` is false fill adjacent slots that have been shifted off, leaving the dataframe
+the same length.
 """
-function shift!(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT)
+function shift!(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT, truncate::Bool=true)
+	df[!, index] = shift!(df[:, index], s)
 	if s > 0
-		df[!, index] = lead!(df[:, index], s)
 		df[begin:end-s, :]
 	elseif s < 0
-		df[!, index] = lag!(df[:, index], s)
 		df[begin+abs(s):end, :]
 	end
 end
@@ -103,16 +103,16 @@ Cleave from the first and last day with time `t`.
 Return a random DataFrame indexed by a DateTime range.
 """
 function randdf(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period;
-	ncol::Integer=4, index::C=INDEX_DT, randfn=randn)
+	ncol::Integer=5, index::CN=INDEX_DT, randfn=randn)
 	randdf(collect(dtr(start, stop, τ)), ncol; index=index, randfn=randfn)
 end
 
 """
 Return a random DataFrame indexed by a DateTime range; `offset` sets the lookback window from now.
-Zero Arg method provided for convenience.
+Zero arg method provided for convenience.
 """
 function randdf(offset::Dates.Period=Month(1), τ::Dates.Period=Hour(1);
-	ncol::Integer=4, index::C=INDEX_DT, randfn=randn)
+	ncol::Integer=5, index::CN=INDEX_DT, randfn=randn)
 	stop = now()
 	randdf(stop-offset, stop, τ; ncol=ncol, index=index, randfn=randfn)
 end
