@@ -52,10 +52,8 @@ end
 
 """
 Shift DataFrame by moving index up or down `abs(s)` steps.
-If `truncate` is false fill adjacent slots that have been shifted off, leaving the dataframe
-the same length.
 """
-function shift!(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT, truncate::Bool=true)
+function shift!(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT)
 	df[!, index] = shift!(df[:, index], s)
 	if s > 0
 		df[begin:end-s, :]
