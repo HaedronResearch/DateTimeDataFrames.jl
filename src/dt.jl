@@ -33,6 +33,16 @@ Select a DataFrame subinterval by start and stop datetime.
 
 """
 sub(set)
+Select DataFrame subintervals by start and stop time within aggregation period `τ`.
+"""
+function sub(df::AbstractDataFrame, start::Dates.Time, stop::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT)
+	subset(agg(df, τ; index=index, col=col),
+		:datetime => dt -> start .<= Time.(dt) .<= stop,
+		ungroup=true)
+end
+
+"""
+sub(set)
 Select a DataFrame subinterval by start and stop points.
 """
 @inline sub(df::AbstractDataFrame, start, stop; index::C=INDEX_DT) = sub(df, Dates.DateTime(start), Dates.DateTime(stop); index=index)
@@ -90,6 +100,7 @@ end
 
 """
 Start the DataFrame from the first day with time `t₀` to the end of the last day with time `t₁`, cleave off the rest.
+XXX Deprecated
 """
 function cleave(df::AbstractDataFrame, t₀::Time, t₁::Time; index::C=INDEX_DT)
 	dti = df[!, index]
@@ -100,6 +111,7 @@ end
 
 """
 Cleave from the first and last day with time `t`.
+XXX Deprecated
 """
 @inline cleave(df::AbstractDataFrame, t::Time=Time(0); index::C=INDEX_DT) = cleave(df, t, t; index=index)
 
