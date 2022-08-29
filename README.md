@@ -6,7 +6,7 @@ Intended to be small and [suckless](https://suckless.org/).
 Contains simple verbs for time series functionality including:
 * `sub()`{set, range}
 * `agg()`regate
-* `shift!()`
+* `shift()`
 * `groupby()` (extensions)
 * cleaning functions: `cleave()`
 
