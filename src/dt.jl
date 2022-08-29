@@ -23,13 +23,13 @@ DateTime range
 sub(set)
 Select a DataFrame subinterval by datetime.
 """
-@inline sub(df::AbstractDataFrame, dt::Dates.DateTime; index::C=INDEX_DT, start::Bool=true) = start ? df[dt .<= df[:, index], :] : df[dt .>= df[:, index], :]
+@inline sub(df::AbstractDataFrame, dt::Dates.TimeType; index::C=INDEX_DT, start::Bool=true) = start ? df[dt .<= df[:, index], :] : df[dt .>= df[:, index], :]
 
 """
 sub(set)
 Select a DataFrame subinterval by start and stop datetime.
 """
-@inline sub(df::AbstractDataFrame, start::Dates.DateTime, stop::Dates.DateTime; index::C=INDEX_DT) = df[start .<= df[:, index] .<= stop, :]
+@inline sub(df::AbstractDataFrame, start::Dates.TimeType, stop::Dates.TimeType; index::C=INDEX_DT) = df[start .<= df[:, index] .<= stop, :]
 
 """
 sub(set)
@@ -106,7 +106,7 @@ Cleave from the first and last day with time `t`.
 """
 Return a random DataFrame indexed by a DateTime range.
 """
-function randdf(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period;
+function randdf(start::Dates.TimeType, stop::Dates.TimeType, τ::Dates.Period;
 	ncol::Integer=5, index::CN=INDEX_DT, randfn=randn)
 	randdf(collect(dtr(start, stop, τ)), ncol; index=index, randfn=randfn)
 end
