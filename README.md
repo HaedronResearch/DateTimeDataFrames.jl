@@ -1,12 +1,12 @@
 # DateTimeDataFrames.jl
 
-Simple utilities for working with DateTime indexed (time series) DataFrames.
-Intended to be small and [suckless](https://suckless.org/).
+Extends `DataFrames.jl` with basic time series utilities, for DateTime indexed DataFrames.
+Intended to be small and [suckless](https://suckless.org/), exporting as few new keywords as possible.
 
 Contains simple verbs for time series functionality including:
 * `sub()`{set, range}
 * `shift()`
-* `groupby()` (extensions for time series)
+* `groupby()` (extensions)
 
 ## Notes
 * Ranges follow Julia convention (inclusive at both ends).

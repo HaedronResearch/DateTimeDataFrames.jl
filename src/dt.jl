@@ -57,28 +57,28 @@ Simple boolean indexing (like df[minute.(df[:, index]) .== 0, :]) may be faster.
 """
 Group by time period `τ` of the `index` column.
 """
-function groupby(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT, col::CN=AGG_DT, sort::Union{Bool, Nothing}=false, skipmissing::Bool=false)
+function groupby(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT, col::CN=AGG_DT, sort::Union{Bool, Nothing}=false, view::Bool=false, skipmissing::Bool=false)
 	df = copy(df; copycols=true)
 	df[!, col] = floor.(df[!, index], τ)
-	groupby(df, col; sort=sort, skipmissing=skipmissing)
+	groupby(df, col; sort=sort, view=view, skipmissing=skipmissing)
 end
 
 """
 Group by a constructor mapped to the `index` column.
 For example `groupby(df, Year)` groups into years.
 """
-groupby(df::AbstractDataFrame, by::DataType; index::C=INDEX_DT, sort::Union{Bool, Nothing}=false, skipmissing::Bool=false) = groupby(df, [by]; index=index, sort=sort, skipmissing=skipmissing)
+groupby(df::AbstractDataFrame, by::DataType; index::C=INDEX_DT, sort::Union{Bool, Nothing}=false, view::Bool=false, skipmissing::Bool=false) = groupby(df, [by]; index=index, sort=sort, view=view, skipmissing=skipmissing)
 
 """
 Group by a DataFrame using constructors mapped to the `index` column.
 For example `groupby(df, [Year, Quarter])` groups into year quarter combinations.
 """
-function groupby(df::AbstractDataFrame, by::Vector{DataType}; index::C=INDEX_DT, sort::Union{Bool, Nothing}=false, skipmissing::Bool=false)
+function groupby(df::AbstractDataFrame, by::Vector{DataType}; index::C=INDEX_DT, sort::Union{Bool, Nothing}=false, view::Bool=false, skipmissing::Bool=false)
 	gcols = ["$(b)($(index))" for b in by]
 	for i in 1:length(by)
 		df[:, gcols[i]] = by[i].(df[:, index])
 	end
-	groupby(df, gcols, sort=sort, skipmissing=skipmissing)
+	groupby(df, gcols, sort=sort, view=view, skipmissing=skipmissing)
 end
 
 """

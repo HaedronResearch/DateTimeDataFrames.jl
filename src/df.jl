@@ -40,16 +40,16 @@ Select DataFrame subrange (subset in range) by `index` column values in `r`.
 Group by sequential subsets demarcated by true values.
 Can be used to create custom bars.
 """
-function groupby(df::AbstractDataFrame, set::BitVector; index::C=INDEX_DF, col::CN=AGG_DF, sort::Union{Bool, Nothing}=false, skipmissing::Bool=false)
+function groupby(df::AbstractDataFrame, set::BitVector; index::C=INDEX_DF, col::CN=AGG_DF, sort::Union{Bool, Nothing}=false, view::Bool=false, skipmissing::Bool=false)
 	df = copy(df; copycols=true)
 	df[!, col] = cumsum(set)
-	groupby(df, col; sort=sort, skipmissing=skipmissing)
+	groupby(df, col; sort=sort, view=view, skipmissing=skipmissing)
 end
 
 """
 Group by subrange groups.
 """
-@inline groupby(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF, col::CN=AGG_DF, sort::Union{Bool, Nothing}=false, skipmissing::Bool=false) = groupby(df, inr(df, r; index=index); index=index, col=col, sort=sort, skipmissing=skipmissing)
+@inline groupby(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF, col::CN=AGG_DF, sort::Union{Bool, Nothing}=false, view::Bool=false, skipmissing::Bool=false) = groupby(df, inr(df, r; index=index); index=index, col=col, sort=sort, view=view, skipmissing=skipmissing)
 
 """
 Shift vector and use first/last seen observation to fill adjacent slots that have been shifted off.
