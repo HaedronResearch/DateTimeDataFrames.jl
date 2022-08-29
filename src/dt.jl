@@ -23,7 +23,7 @@ DateTime range
 sub(set)
 Select a DataFrame subinterval by datetime.
 """
-@inline sub(df::AbstractDataFrame, dt::Dates.DateTime; index::C=INDEX_DT, start::Bool=true) = start? df[dt .<= df[:, index], :] : df[dt .>= df[:, index], :]
+@inline sub(df::AbstractDataFrame, dt::Dates.DateTime; index::C=INDEX_DT, start::Bool=true) = start ? df[dt .<= df[:, index], :] : df[dt .>= df[:, index], :]
 
 """
 sub(set)
