@@ -15,31 +15,30 @@ end
 """
 DateTime range
 """
-@inline dtr(start::Dates.DateTime, stop::Dates.DateTime, τ::Dates.Period) = start:τ:stop
+@inline dtr(dt₀::Dates.DateTime, dt₁::Dates.DateTime, τ::Dates.Period) = dt₀:τ:dt₁
 
 @inline dtr(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = dtr(df[begin, index], df[end, index], τ)
 
 """
 sub(set)
-Select a DataFrame subinterval by datetime.
+Select a DataFrame subinterval by time type.
 """
-@inline sub(df::AbstractDataFrame, dt::Dates.TimeType; index::C=INDEX_DT, start::Bool=true) = start ? df[dt .<= df[:, index], :] : df[dt .>= df[:, index], :]
+@inline sub(df::AbstractDataFrame, tt::Dates.TimeType; index::C=INDEX_DT, after::Bool=true) = after ? df[tt .<= df[:, index], :] : df[tt .>= df[:, index], :]
 
 """
 sub(set)
-Select a DataFrame subinterval by start and stop datetime.
+Select a DataFrame subinterval within [tt₀, tt₁].
 """
-@inline sub(df::AbstractDataFrame, start::Dates.TimeType, stop::Dates.TimeType; index::C=INDEX_DT) = df[start .<= df[:, index] .<= stop, :]
+@inline sub(df::AbstractDataFrame, tt₀::Dates.TimeType, tt₁::Dates.TimeType; index::C=INDEX_DT) = df[tt₀ .<= df[:, index] .<= tt₁, :]
 
 """
 sub(set)
 Select DataFrame subintervals by start and stop time within aggregation period `τ`.
 """
-function sub(df::AbstractDataFrame, start::Dates.Time, stop::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT)
-	subset(agg(df, τ; index=index, col=col),
-		:datetime => dt -> start .<= Time.(dt) .<= stop,
-		ungroup=true)
-end
+@inline sub(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT) = subset(
+	agg(df, τ; index=index, col=col),
+	index => dt -> t₀ .<= Time.(dt) .<= t₁,
+	ungroup=true)
 
 """
 sub(set)
@@ -98,29 +97,29 @@ function groupby(df::AbstractDataFrame, by::Vector{DataType}; index::C=INDEX_DT)
 	groupby(df, gcols)
 end
 
-"""
-Start the DataFrame from the first day with time `t₀` to the end of the last day with time `t₁`, cleave off the rest.
-XXX Deprecated
-"""
-function cleave(df::AbstractDataFrame, t₀::Time, t₁::Time; index::C=INDEX_DT)
-	dti = df[!, index]
-	day₀ = df[findfirst(dt->Time(dt)>=t₀, dti), index]
-	day₁ = df[findlast(dt->Time(dt)<=t₁, dti), index]
-	sub(df, day₀, day₁)
-end
+# """
+# Start the DataFrame from the first day with time `t₀` to the end of the last day with time `t₁`, cleave off the rest.
+# XXX Deprecated
+# """
+# function cleave(df::AbstractDataFrame, t₀::Time, t₁::Time; index::C=INDEX_DT)
+# 	dti = df[!, index]
+# 	day₀ = df[findfirst(dt->Time(dt)>=t₀, dti), index]
+# 	day₁ = df[findlast(dt->Time(dt)<=t₁, dti), index]
+# 	sub(df, day₀, day₁)
+# end
 
-"""
-Cleave from the first and last day with time `t`.
-XXX Deprecated
-"""
-@inline cleave(df::AbstractDataFrame, t::Time=Time(0); index::C=INDEX_DT) = cleave(df, t, t; index=index)
+# """
+# Cleave from the first and last day with time `t`.
+# XXX Deprecated
+# """
+# @inline cleave(df::AbstractDataFrame, t::Time=Time(0); index::C=INDEX_DT) = cleave(df, t, t; index=index)
 
 """
 Return a random DataFrame indexed by a DateTime range.
 """
-function randdf(start::Dates.TimeType, stop::Dates.TimeType, τ::Dates.Period;
+function randdf(tt₀::Dates.TimeType, tt₁::Dates.TimeType, τ::Dates.Period;
 	ncol::Integer=5, index::CN=INDEX_DT, randfn=randn)
-	randdf(collect(dtr(start, stop, τ)), ncol; index=index, randfn=randfn)
+	randdf(collect(dtr(tt₀, tt₁, τ)), ncol; index=index, randfn=randfn)
 end
 
 """
