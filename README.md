@@ -3,10 +3,10 @@
 Extends `DataFrames.jl` with basic time series utilities, for DateTime indexed DataFrames.
 Intended to be small and [suckless](https://suckless.org/), exporting as few new keywords as possible.
 
-Contains simple verbs for time series functionality including:
-* `sub()`{set, range}
+Contains simple verbs/extensions for time series functionality including:
+* `subset()`
 * `shift()`
-* `groupby()` (extensions)
+* `groupby()`
 
 ## Notes
 * Ranges follow Julia convention (inclusive at both ends).

@@ -1,5 +1,5 @@
 using DataFrames
-import DataFrames: groupby
+import DataFrames: subset, groupby
 
 """
 General
@@ -28,13 +28,13 @@ About the same speed as `inr`, although the difference on memory and speed may v
 sub(set)
 Select DataFrame subset by boolean indexing.
 """
-@inline sub(df::AbstractDataFrame, set::BitVector) = df[set, :]
+@inline subset(df::AbstractDataFrame, set::BitVector) = df[set, :]
 
 """
-sub(set)
+sub(range)
 Select DataFrame subrange (subset in range) by `index` column values in `r`.
 """
-@inline sub(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF) = sub(df, inr(df, r; index=index))
+@inline subset(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF) = subset(df, inr(df, r; index=index))
 
 """
 Group by sequential subsets demarcated by true values.

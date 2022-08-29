@@ -1,5 +1,5 @@
 using DataFrames, Dates
-import DataFrames: groupby
+import DataFrames: subset, groupby
 
 """
 Time Series
@@ -20,39 +20,39 @@ DateTime range
 @inline dtr(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = dtr(df[begin, index], df[end, index], τ)
 
 """
-sub(set)
+sub(interval)
 Select a DataFrame subinterval by time type.
 """
-@inline sub(df::AbstractDataFrame, tt::Dates.TimeType; index::C=INDEX_DT, after::Bool=true) = after ? df[tt .<= df[:, index], :] : df[tt .>= df[:, index], :]
+@inline subset(df::AbstractDataFrame, tt::Dates.TimeType; index::C=INDEX_DT, after::Bool=true) = after ? df[tt .<= df[:, index], :] : df[tt .>= df[:, index], :]
 
 """
-sub(set)
+sub(interval)
 Select a DataFrame subinterval within [tt₀, tt₁].
 """
-@inline sub(df::AbstractDataFrame, tt₀::Dates.TimeType, tt₁::Dates.TimeType; index::C=INDEX_DT) = df[tt₀ .<= df[:, index] .<= tt₁, :]
+@inline subset(df::AbstractDataFrame, tt₀::Dates.TimeType, tt₁::Dates.TimeType; index::C=INDEX_DT) = df[tt₀ .<= df[:, index] .<= tt₁, :]
 
 """
-sub(set)
+sub(interval)
 Select DataFrame subintervals by start and stop time within aggregation period `τ`.
 """
-@inline sub(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT) = subset(
+@inline subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT) = subset(
 	groupby(df, τ; index=index, col=col),
 	index => dt -> t₀ .<= Time.(dt) .<= t₁,
 	ungroup=true)
 
 """
-sub(set)
+sub(interval)
 Select a DataFrame subinterval by start and stop points.
 """
-@inline sub(df::AbstractDataFrame, start, stop; index::C=INDEX_DT) = sub(df, Dates.DateTime(start), Dates.DateTime(stop); index=index)
+@inline subset(df::AbstractDataFrame, start::Integer, stop::Integer; index::C=INDEX_DT) = subset(df, Dates.DateTime(start), Dates.DateTime(stop); index=index)
 
 """
-sub(set)
+sub(range)
 Select DataFrame subrange by DateTime `index` column values in `τ` Period.
 
 Simple boolean indexing (like df[minute.(df[:, index]) .== 0, :]) may be faster.
 """
-@inline sub(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = sub(df, dtr(df, τ; index=index); index=index)
+@inline subset(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = subset(df, dtr(df, τ; index=index); index=index)
 
 """
 Group by time period `τ` of the `index` column.

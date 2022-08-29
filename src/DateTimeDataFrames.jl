@@ -1,7 +1,7 @@
 module DateTimeDataFrames
 
-export sub, shift, shift!, sampledf, randdf
-export groupby
+export shift, shift!, sampledf, randdf
+export subset, groupby
 
 include("df.jl")
 include("dt.jl")
