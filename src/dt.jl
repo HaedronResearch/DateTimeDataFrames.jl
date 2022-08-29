@@ -95,23 +95,6 @@ end
 
 @inline shift(df::AbstractDataFrame, s::Integer; index::C=INDEX_DT) = shift!(copy(df), s; index=index)
 
-# """
-# Start the DataFrame from the first day with time `t₀` to the end of the last day with time `t₁`, cleave off the rest.
-# XXX Deprecated
-# """
-# function cleave(df::AbstractDataFrame, t₀::Time, t₁::Time; index::C=INDEX_DT)
-# 	dti = df[!, index]
-# 	day₀ = df[findfirst(dt->Time(dt)>=t₀, dti), index]
-# 	day₁ = df[findlast(dt->Time(dt)<=t₁, dti), index]
-# 	sub(df, day₀, day₁)
-# end
-
-# """
-# Cleave from the first and last day with time `t`.
-# XXX Deprecated
-# """
-# @inline cleave(df::AbstractDataFrame, t::Time=Time(0); index::C=INDEX_DT) = cleave(df, t, t; index=index)
-
 """
 Return a random DataFrame indexed by a DateTime range.
 """
