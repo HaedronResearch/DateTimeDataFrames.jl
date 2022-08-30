@@ -35,10 +35,11 @@ Select a DataFrame subinterval within [tt₀, tt₁].
 sub(interval)
 Select DataFrame subintervals by start and stop time within aggregation period `τ`.
 """
-@inline subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true) = subset(
+@inline subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true) = select!(
+	subset(
 	groupby(df, τ; index=index, col=col),
 	index => dt -> t₀ .<= Time.(dt) .<= t₁,
-	skipmissing=skipmissing, view=view, ungroup=ungroup)
+	skipmissing=skipmissing, view=view, ungroup=ungroup), Not(col))
 
 """
 sub(interval)
