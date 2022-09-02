@@ -42,16 +42,19 @@ $(TYPEDSIGNATURES)
 sub(interval)
 Select DataFrame subintervals by start and stop time within aggregation period `τ`.
 """
-@inline subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true) = select!(
-	subset(
-	groupby(df, τ; index=index, col=col),
-	index => dt -> t₀ .<= Time.(dt) .<= t₁,
-	skipmissing=skipmissing, view=view, ungroup=ungroup), Not(col))
+function subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
+	select!(
+		subset(groupby(df, τ; index=index, col=col),
+			index => dt -> t₀ .<= Time.(dt) .<= t₁,
+			skipmissing=skipmissing, view=view, ungroup=ungroup),
+		Not(col)
+	)
+end
 
 """
 $(TYPEDSIGNATURES)
 sub(interval)
-Select a DataFrame subinterval by start and stop points.
+Select a DataFrame subinterval by `start` and `stop` Integers coerced to DateTimes.
 """
 @inline subset(df::AbstractDataFrame, start::Integer, stop::Integer; index::C=INDEX_DT) = subset(df, Dates.DateTime(start), Dates.DateTime(stop); index=index)
 
@@ -59,7 +62,6 @@ Select a DataFrame subinterval by start and stop points.
 $(TYPEDSIGNATURES)
 sub(range)
 Select DataFrame subrange by DateTime `index` column values in `τ` Period.
-
 Simple boolean indexing (like df[minute.(df[:, index]) .== 0, :]) may be faster.
 """
 @inline subset(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = subset(df, dtr(df, τ; index=index); index=index)

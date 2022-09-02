@@ -34,7 +34,7 @@ Select DataFrame subset by boolean indexing.
 """
 $(TYPEDSIGNATURES)
 sub(range)
-Select DataFrame subrange (subset in range) by `index` column values in `r`.
+Select DataFrame subrange by `index` column values in `r`.
 """
 @inline subset(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF) = subset(df, inr(df, r; index=index))
 
