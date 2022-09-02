@@ -1,6 +1,6 @@
 # DateTimeDataFrames.jl
 
-Extends `DataFrames.jl` with basic time series utilities, for DateTime indexed DataFrames.
+Extends `DataFrames.jl` with basic time series utilities, for `DateTime` indexed DataFrames.
 Intended to be small and [suckless](https://suckless.org/), exporting as few new keywords as possible.
 
 Contains simple verbs/extensions for time series functionality including:

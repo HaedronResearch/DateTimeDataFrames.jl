@@ -16,7 +16,7 @@ end
 $(TYPEDSIGNATURES)
 DateTime range
 """
-@inline dtr(dt₀::Dates.DateTime, dt₁::Dates.DateTime, τ::Dates.Period) = dt₀:τ:dt₁
+@inline dtr(dt₀::Dates.AbstractDateTime, dt₁::Dates.AbstractDateTime, τ::Dates.Period) = dt₀:τ:dt₁
 
 """
 $(TYPEDSIGNATURES)
@@ -33,14 +33,14 @@ Select a DataFrame subinterval by time type.
 """
 $(TYPEDSIGNATURES)
 sub(interval)
-Select a DataFrame subinterval within [tt₀, tt₁].
+Select a DataFrame subinterval [`tt₀`, `tt₁`].
 """
 @inline subset(df::AbstractDataFrame, tt₀::Dates.TimeType, tt₁::Dates.TimeType; index::C=INDEX_DT) = df[tt₀ .<= df[:, index] .<= tt₁, :]
 
 """
 $(TYPEDSIGNATURES)
 sub(interval)
-Select DataFrame subintervals by start and stop time within aggregation period `τ`.
+Select DataFrame subintervals in [`t₀`, `t₁`], within all `τ`aggregation periods.
 """
 function subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
 	select!(
