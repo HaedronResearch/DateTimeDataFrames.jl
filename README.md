@@ -1,7 +1,7 @@
 # DateTimeDataFrames.jl
 
-Extends `DataFrames.jl` with basic time series utilities, for `DateTime` indexed DataFrames.
-Intended to be small and [suckless](https://suckless.org/), exporting as few new keywords as possible.
+Extends `DataFrames.jl` with basic time series utilities, for `DateTime` indexed `DataFrame`s.
+Intended to be small, intuitive, and [suckless](https://suckless.org/). This package is a work in progress.
 
 Contains simple verbs/extensions for time series functionality including:
 * `subset()`
@@ -12,8 +12,9 @@ Contains simple verbs/extensions for time series functionality including:
 * Ranges follow Julia convention (inclusive at both ends).
 * All operations work at arbitrary frequencies (time-based or "irregular").
 * By default the index column is assumed to be called `:datetime`, setting the `index` keyword can change this behavior.
-* The index column is assumed to be sorted in ascending order when relevant. Sort options for DataFrames calls are set off for performance.
+* The index column is assumed to be sorted in ascending order when relevant. Sort options for `DataFrames.jl` calls are set off for performance.
 
-## TODO
+## TODO before ver 1.**
 * unit tests
+* docs
 
