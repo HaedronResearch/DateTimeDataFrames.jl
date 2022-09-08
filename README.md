@@ -3,7 +3,7 @@
 Extends `DataFrames.jl` with basic time series utilities, for `DateTime` indexed `DataFrame`s.
 Intended to be small, intuitive, and [suckless](https://suckless.org/). This package is a work in progress.
 
-Contains simple verbs/extensions for time series functionality including:
+Contains simple extensions for time series functionality including:
 * `subset()`
 * `shift()`
 * `groupby()`
