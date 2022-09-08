@@ -17,4 +17,5 @@ Contains simple extensions for time series functionality including:
 ## TODO before ver 1.**
 * unit tests
 * docs
+* examples
 
