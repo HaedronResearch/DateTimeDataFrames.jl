@@ -1,7 +1,7 @@
 # DateTimeDataFrames.jl
 
 Extends `DataFrames.jl` with basic time series utilities, for `DateTime` indexed `DataFrame`s.
-Intended to be small, intuitive, and [suckless](https://suckless.org/philosophy`). This package is a work in progress.
+Intended to be small, intuitive, and [suckless](https://suckless.org/philosophy/`). This package is a work in progress.
 
 Contains simple extensions for time series functionality including:
 * `subset()`
