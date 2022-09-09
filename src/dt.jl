@@ -110,6 +110,21 @@ Shift DataFrame by moving index up or down `abs(s)` steps.
 
 """
 $(TYPEDSIGNATURES)
+Last unique row.
+"""
+function lastunique(df::AbstractDataFrame; index::C=INDEX_DT)
+	start = last(select(df, Not(index)))
+	values = select(df[1:end-1, :], Not(index))
+	for row in reverse(eachrow(values))
+		if row != start
+			return df[rownumber(row)+1, :]
+		end
+	end
+	df[1, :] # they're all the same
+end
+
+"""
+$(TYPEDSIGNATURES)
 Return a random DataFrame indexed by a DateTime range.
 """
 function randdf(tt₀::Dates.TimeType, tt₁::Dates.TimeType, τ::Dates.Period;
