@@ -39,11 +39,11 @@ $(TYPEDSIGNATURES)
 $(TYPEDSIGNATURES)
 sub(interval)
 Select a DataFrame subinterval by time type.
-The keyword `how` must be one of (`:=`, `:<`, `:≤`, `:≥`, `:>`).
+The keyword `how` must be one of (`:∈`, `:<`, `:≤`, `:≥`, `:>`).
 """
-function subset(df::AbstractDataFrame, tt::Dates.TimeType; index::C=INDEX_DT, how::Symbol=:=)
+function subset(df::AbstractDataFrame, tt::Dates.TimeType; index::C=INDEX_DT, how::Symbol=:∈)
 	r₀, r₁ = 1, nrow(df)
-	if how == :=
+	if how == :∈
 		r₀ = first(df, tt; index=index)
 		r₁ = last(df, tt; index=index)
 	elseif how == :<
