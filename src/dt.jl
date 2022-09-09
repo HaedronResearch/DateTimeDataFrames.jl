@@ -42,7 +42,7 @@ $(TYPEDSIGNATURES)
 sub(interval)
 Select DataFrame subintervals in [`t₀`, `t₁`], within all `τ`aggregation periods.
 """
-function subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period=Day(1); index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
+function subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period; index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
 	select!(
 		subset(groupby(df, τ; index=index, col=col),
 			index => dt -> t₀ .<= Time.(dt) .<= t₁,
