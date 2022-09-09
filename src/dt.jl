@@ -53,13 +53,6 @@ end
 
 """
 $(TYPEDSIGNATURES)
-sub(interval)
-Select a DataFrame subinterval by `start` and `stop` Integers coerced to DateTimes.
-"""
-@inline subset(df::AbstractDataFrame, start::Integer, stop::Integer; index::C=INDEX_DT) = subset(df, Dates.DateTime(start), Dates.DateTime(stop); index=index)
-
-"""
-$(TYPEDSIGNATURES)
 sub(range)
 Select DataFrame subrange by DateTime `index` column values in `τ` Period.
 Simple boolean indexing (like df[minute.(df[:, index]) .== 0, :]) may be faster.

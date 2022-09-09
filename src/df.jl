@@ -27,9 +27,20 @@ About the same speed as `inr`, although the difference on memory and speed may v
 """
 $(TYPEDSIGNATURES)
 sub(set)
-Select DataFrame subset by boolean indexing.
+Select DataFrame subset.
 """
-@inline subset(df::AbstractDataFrame, set::BitVector) = df[set, :]
+@inline subset(df::AbstractDataFrame, set::Union{BitVector, UnitRange}) = df[set, :]
+
+"""
+$(TYPEDSIGNATURES)
+sub(set)
+Select DataFrame subset by row or row number.
+"""
+@inline function subset(df::AbstractDataFrame, r₀::Union{DataFrameRow, Integer}, r₁::Union{DataFrameRow, Integer})
+	i₀ = r₀ isa DataFrameRow ? rownumber(r₀) : r₀
+	i₁ = r₁ isa DataFrameRow ? rownumber(r₁) : r₁
+	subset(df, i₀:i₁)
+end
 
 """
 $(TYPEDSIGNATURES)
