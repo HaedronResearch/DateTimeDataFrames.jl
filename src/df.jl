@@ -36,7 +36,7 @@ $(TYPEDSIGNATURES)
 sub(set)
 Select DataFrame subset by row or row number.
 """
-@inline function subset(df::AbstractDataFrame, r₀::Union{DataFrameRow, Integer}, r₁::Union{DataFrameRow, Integer})
+function subset(df::AbstractDataFrame, r₀::Union{DataFrameRow, Integer}, r₁::Union{DataFrameRow, Integer})
 	i₀ = r₀ isa DataFrameRow ? rownumber(r₀) : r₀
 	i₁ = r₁ isa DataFrameRow ? rownumber(r₁) : r₁
 	subset(df, i₀:i₁)

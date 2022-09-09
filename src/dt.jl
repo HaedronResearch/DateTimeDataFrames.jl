@@ -14,6 +14,18 @@ end
 
 """
 $(TYPEDSIGNATURES)
+First row of the given TimeType.
+"""
+@inline first(df::AbstractDataFrame, tt::T; index::C=INDEX_DT) where T<:Dates.TimeType = df[findfirst(dt->T(dt)==tt, df[:, index]), :]
+
+"""
+$(TYPEDSIGNATURES)
+Last row of the given TimeType.
+"""
+@inline last(df::AbstractDataFrame, tt::T; index::C=INDEX_DT) where T<:Dates.TimeType = df[findlast(dt->T(dt)==tt, df[:, index]), :]
+
+"""
+$(TYPEDSIGNATURES)
 DateTime range
 """
 @inline dtr(dt₀::Dates.AbstractDateTime, dt₁::Dates.AbstractDateTime, τ::Dates.Period) = dt₀:τ:dt₁
@@ -21,21 +33,34 @@ DateTime range
 """
 $(TYPEDSIGNATURES)
 """
-@inline dtr(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = dtr(df[begin, index], df[end, index], τ)
+@inline dtr(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = dtr(df[1, index], df[end, index], τ)
 
 """
 $(TYPEDSIGNATURES)
 sub(interval)
 Select a DataFrame subinterval by time type.
+
+Cases for `how` keyword:
+	`:on` => [`tt`, `tt`]
+	`:before` => [`1`, `first(df, tt)`]
+	`:after` => [`last(df, tt)`, `end`]
 """
-@inline subset(df::AbstractDataFrame, tt::Dates.TimeType; index::C=INDEX_DT, after::Bool=true) = after ? df[tt .<= df[:, index], :] : df[tt .>= df[:, index], :]
+function subset(df::AbstractDataFrame, tt::Dates.TimeType; index::C=INDEX_DT, how::Symbol=:on)
+	if how == :on
+		subset(df, first(df, tt; index=index), last(df, tt; index=index))
+	elseif how == :before
+		subset(df, 1, first(df, tt; index=index))
+	elseif how == :after
+		subset(df, last(df, tt; index=index), nrow(df))
+	end 
+end
 
 """
 $(TYPEDSIGNATURES)
 sub(interval)
 Select a DataFrame subinterval [`tt₀`, `tt₁`].
 """
-@inline subset(df::AbstractDataFrame, tt₀::Dates.TimeType, tt₁::Dates.TimeType; index::C=INDEX_DT) = df[tt₀ .<= df[:, index] .<= tt₁, :]
+@inline subset(df::AbstractDataFrame, tt₀::Dates.TimeType, tt₁::Dates.TimeType; index::C=INDEX_DT) = subset(df, first(df, tt₀; index=index), last(df, tt₁; index=index))
 
 """
 $(TYPEDSIGNATURES)
