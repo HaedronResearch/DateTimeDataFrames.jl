@@ -26,17 +26,6 @@ Last row of the given TimeType.
 
 """
 $(TYPEDSIGNATURES)
-DateTime range
-"""
-@inline dtr(dt₀::Dates.AbstractDateTime, dt₁::Dates.AbstractDateTime, τ::Dates.Period) = dt₀:τ:dt₁
-
-"""
-$(TYPEDSIGNATURES)
-"""
-@inline dtr(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = dtr(df[1, index], df[end, index], τ)
-
-"""
-$(TYPEDSIGNATURES)
 sub(interval)
 Select a DataFrame subinterval by time type.
 The keyword `how` must be one of (`:∈`, `:<`, `:≤`, `:≥`, `:>`).
@@ -70,7 +59,7 @@ $(TYPEDSIGNATURES)
 sub(interval)
 Select DataFrame subintervals in [`t₀`, `t₁`], within all `τ`aggregation periods.
 """
-function subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Dates.Period; index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
+function subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Period; index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
 	select!(
 		subset(groupby(df, τ; index=index, col=col),
 			index => dt -> t₀ .<= Time.(dt) .<= t₁,
@@ -85,13 +74,13 @@ sub(range)
 Select DataFrame subrange by DateTime `index` column values in `τ` Period.
 Simple boolean indexing (like df[minute.(df[:, index]) .== 0, :]) may be faster.
 """
-@inline subset(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT) = subset(df, dtr(df, τ; index=index); index=index)
+@inline subset(df::AbstractDataFrame, τ::Period; index::C=INDEX_DT) = subset(df, df[1, index]: τ:df[end, index]; index=index)
 
 """
 $(TYPEDSIGNATURES)
 Group by time period `τ` of the `index` column.
 """
-function groupby(df::AbstractDataFrame, τ::Dates.Period; index::C=INDEX_DT, col::CN=AGG_DT, sort::Union{Bool, Nothing}=false, skipmissing::Bool=false)
+function groupby(df::AbstractDataFrame, τ::Period; index::C=INDEX_DT, col::CN=AGG_DT, sort::Union{Bool, Nothing}=false, skipmissing::Bool=false)
 	df = copy(df; copycols=true)
 	df[!, col] = floor.(df[!, index], τ)
 	groupby(df, col; sort=sort, skipmissing=skipmissing)
@@ -153,21 +142,35 @@ end
 
 """
 $(TYPEDSIGNATURES)
-Return a random DataFrame indexed by a DateTime range.
+Return a Matrix of simulated OHLC prices, sampled from random walk with constant drift.
+This isn't meant to be a realistic model for prices, just for quick testing.
 """
-function randdf(tt₀::Dates.TimeType, tt₁::Dates.TimeType, τ::Dates.Period;
-	ncol::Integer=5, index::CN=INDEX_DT, randfn=randn)
-	randdf(collect(dtr(tt₀, tt₁, τ)), ncol; index=index, randfn=randfn)
+function randohlc(l::Integer; resolution::Integer=10, p₀::Real=100.)
+	n = l*resolution
+	x = fill(1/(n-1), n-1) .+ randn(n-1)
+	insert!(x, 1, p₀)
+	p = cumsum(x)
+	ohlc = [[w[1] maximum(w) minimum(w) w[end]] for  w in Iterators.partition(p, resolution)]
+	reduce(vcat, ohlc)
 end
 
 """
 $(TYPEDSIGNATURES)
-Return a random DataFrame indexed by a DateTime range; `offset` sets the lookback window from now.
+Return a random TimeType indexed DataFrame.
+By default returns random OHLC data.
+"""
+function randdf(idx::AbstractVector{T}, randmat::Function=randohlc; index::CN=INDEX_DT, names=[:open, :high, :low, :close]) where T<:Union{TimeType, Period}
+	hcat(DataFrame(index=>idx), DataFrame(randmat(length(idx)), names))
+end
+
+"""
+$(TYPEDSIGNATURES)
+Return a random TimeType indexed DataFrame.
+By default returns random OHLC data.
 Zero arg method provided for convenience.
 """
-function randdf(offset::Dates.Period=Month(1), τ::Dates.Period=Hour(1);
-	ncol::Integer=5, index::CN=INDEX_DT, randfn=randn)
+function randdf(offset::Period=Month(1), τ::Period=Hour(1), randmat::Function=randohlc; index::CN=INDEX_DT, names=[:open, :high, :low, :close])
 	stop = now()
-	randdf(stop-offset, stop, τ; ncol=ncol, index=index, randfn=randfn)
+	randdf(stop-offset:τ:stop, randmat; index=index, names=names)
 end
 

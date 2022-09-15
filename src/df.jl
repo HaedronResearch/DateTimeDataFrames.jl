@@ -83,11 +83,11 @@ end
 
 """
 $(TYPEDSIGNATURES)
-Return a random DataFrame indexed by `idx`.
+Return a random `idx` indexed DataFrame of `randmat(length(idx))` data.
+By default returns four data columns of unit Normal data.
 """
-function randdf(idx::AbstractVector{T}, ncol::Integer=5; index::CN=INDEX_DF, randfn=randn) where T
-	val = randfn(size(idx)[1], ncol-1)
-	hcat(DataFrame(index=>idx), DataFrame(val, :auto))
+function randdf(idx::AbstractVector{T}, randmat::Function=l->randn(l, 4); index::CN=INDEX_DF, names=:auto) where T
+	hcat(DataFrame(index=>idx), DataFrame(randmat(length(idx)), names))
 end
 
 """

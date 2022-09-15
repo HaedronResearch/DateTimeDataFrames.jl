@@ -3,7 +3,7 @@ module DateTimeDataFrames
 using Dates
 using DataFrames
 import DataFrames: first, last, subset, groupby
-using DocStringExtensions
+using DocStringExtensions: TYPEDSIGNATURES
 
 const CN = Union{Symbol, AbstractString}   # valid column name types
 const C = Union{CN, Integer}               # valid column getindex() identifier types
