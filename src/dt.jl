@@ -27,21 +27,21 @@ Last row of the given TimeType.
 """
 $(TYPEDSIGNATURES)
 sub(interval)
-Select a DataFrame subinterval by time type.
-The keyword `how` must be one of (`:∈`, `:<`, `:≤`, `:≥`, `:>`).
+Select a DataFrame subinterval by time type condition.
+The `op` argument must be one of (`:∈`, `:<`, `:≤`, `:≥`, `:>`).
 """
-function subset(df::AbstractDataFrame, tt::Dates.TimeType; index::C=INDEX_DT, how::Symbol=:∈)
+function subset(df::AbstractDataFrame, op::Symbol, tt::Dates.TimeType; index::C=INDEX_DT)
 	r₀, r₁ = 1, nrow(df)
-	if how == :∈
+	if op == :∈
 		r₀ = first(df, tt; index=index)
 		r₁ = last(df, tt; index=index)
-	elseif how == :<
+	elseif op == :<
 		r₁ = first(df, tt; index=index)
-	elseif how == :≤
+	elseif op == :≤
 		r₁ = last(df, tt; index=index)
-	elseif how == :≥
+	elseif op == :≥
 		r₀ = first(df, tt; index=index)
-	elseif how == :>
+	elseif op == :>
 		r₀ = last(df, tt; index=index)
 	end
 	subset(df, r₀, r₁)
