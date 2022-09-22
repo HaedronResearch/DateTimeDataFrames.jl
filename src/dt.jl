@@ -130,6 +130,7 @@ Shift DataFrame by moving index up or down `abs(s)` steps.
 """
 $(TYPEDSIGNATURES)
 Last unique row.
+# TODO refactor with DataFrames.nonunique
 """
 function lastunique(df::AbstractDataFrame; index::C=INDEX_DT)
 	start = last(select(df, Not(index)))
@@ -142,53 +143,109 @@ function lastunique(df::AbstractDataFrame; index::C=INDEX_DT)
 	df[1, :] # they're all the same
 end
 
+# """
+# $(TYPEDSIGNATURES)
+# Repeat last row up to t₁ as a DataFrame
+# """
+# function repeatlast(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
+# 	dᵢ, tᵢ = Date(df[end, index]), Time(df[end, index])
+# 	if (lenᵢ₁ = Int((t₁ - tᵢ)/τ)) > 0
+# 		rl = repeat(df[[end], :]; inner=lenᵢ₁)
+# 		rl[:, index] = Dates.DateTime.(dᵢ, tᵢ+τ:τ:t₁)
+# 		rl
+# 	else
+# 		nothing
+# 	end
+# end
+
+# """
+# $(TYPEDSIGNATURES)
+# Repeat last row up to t₁ as a DataFrame
+# """
+# function repeatlast(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_DT) where T<:TimeType
+# 	ttᵢ = T(df[end, index])
+# 	if (lenᵢ₁ = Int((tt₁ - ttᵢ)/τ)) > 0
+# 		rl = repeat(df[[end], :]; inner=lenᵢ₁)
+# 		rl[:, index] = Dates.DateTime.(tᵢ+τ:τ:t₁)
+# 		rl
+# 	else
+# 		nothing
+# 	end
+# end
+
 """
 $(TYPEDSIGNATURES)
-Repeat last row up to t₁ as a DataFrame
+Expand index to `t₁`.
 """
-function repeatlast(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
-	dᵢ, tᵢ = Date(df[end, index]), Time(df[end, index])
-	if (lenᵢ₁ = Int((t₁ - tᵢ)/τ)) > 0
-		rl = repeat(df[[end], :]; inner=lenᵢ₁)
-		rl[:, index] = Dates.DateTime.(dᵢ, tᵢ+τ:τ:t₁)
-		rl
+function expandindex(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
+	idx = df[1, index]:τ:Dates.DateTime(Date(df[end, index]), t₁)
+	if nrow(df) < size(idx, 1)
+		sort!(outerjoin(DataFrame(index=>idx), df; on=index), index)
 	else
-		nothing
+		df
 	end
 end
 
 """
 $(TYPEDSIGNATURES)
-Repeat last row up to t₁ as a DataFrame
+Expand index to `tt₁`.
 """
-function repeatlast(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_DT) where T<:TimeType
-	ttᵢ = T(df[end, index])
-	if (lenᵢ₁ = Int((tt₁ - ttᵢ)/τ)) > 0
-		rl = repeat(df[[end], :]; inner=lenᵢ₁)
-		rl[:, index] = Dates.DateTime.(tᵢ+τ:τ:t₁)
-		rl
+function expandindex(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_DT) where T<:TimeType
+	idx = df[1, index]:τ:tt₁
+	if nrow(df) < size(idx, 1)
+		sort!(outerjoin(DataFrame(index=>idx), df; on=index), index)
 	else
-		nothing
+		df
 	end
 end
 
 """
 $(TYPEDSIGNATURES)
-Forward fill over Period `τ`
+Forward fill / forward coalesce values
 """
-function ffill(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-	ext = repeatlast(df, τ, tt₁; index=index)
-	isnothing(ext) ? df : vcat(df, ext)
+function ffill(df::AbstractDataFrame; index::C=INDEX_DT)
+	select(df, index, Not(index).=>ffill, renamecols=false)
 end
 
 """
 $(TYPEDSIGNATURES)
-Forward fill over Period `τ` (in-place)
+Forward fill / forward coalesce values
 """
-function ffill!(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-	ext = repeatlast(df, τ, tt₁; index=index)
-	isnothing(ext) ? df : append!(df, ext)
+function ffill!(df::AbstractDataFrame; index::C=INDEX_DT)
+	select!(df, index, Not(index).=>ffill, renamecols=false)
 end
+
+"""
+$(TYPEDSIGNATURES)
+Expand index `t₁` and ffill non-index Missing values.
+"""
+function expand(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
+	ffill!(expandindex(df, τ, tt₁))
+end
+
+# """
+# $(TYPEDSIGNATURES)
+# Forward fill over Period `τ` to `tt₁`
+# """
+# function ffill(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
+# 	# TODO ffill within the DataFrame
+# 	idx = df[1, index]:τ:df[end, index]
+# 	lenₛₑ = size(idx, 1)
+# 	if nrow(df) < lenₛₑ
+		
+# 	end
+# 	ext = repeatlast(df, τ, tt₁; index=index)
+# 	isnothing(ext) ? df : vcat(df, ext)
+# end
+
+# """
+# $(TYPEDSIGNATURES)
+# Forward fill over Period `τ` to `tt₁` (in-place)
+# """
+# function ffill!(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
+# 	ext = repeatlast(df, τ, tt₁; index=index)
+# 	isnothing(ext) ? df : append!(df, ext)
+# end
 
 """
 $(TYPEDSIGNATURES)

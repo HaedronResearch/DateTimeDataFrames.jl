@@ -82,6 +82,17 @@ function shift!(vec::AbstractVector{T}, s::Integer) where T
 end
 
 """
+Forward fill / forward coalesce values
+"""
+function ffill(xₜ::AbstractVector; default=missing)
+	prev = default
+	for (i, xᵢ) in enumerate(xₜ)
+		prev = xₜ[i] = coalesce(xᵢ, prev)
+	end
+	xₜ
+end
+
+"""
 $(TYPEDSIGNATURES)
 Return a random `idx` indexed DataFrame of `randmat(length(idx))` data.
 By default returns four data columns of unit Normal data.
