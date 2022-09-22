@@ -144,24 +144,32 @@ end
 
 """
 $(TYPEDSIGNATURES)
-Repeat last row up to t₁
+Repeat last row up to t₁ as a DataFrame
 """
 function repeatlast(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
-	tᵢ = Time(df[end, index])
-	rl = repeat(df[[end], :]; inner=Int((t₁ - tᵢ)/τ))
-	rl[:, index] = DateTime.(Date(df[end, index]), tᵢ+τ:τ:t₁)
-	rl
+	dᵢ, tᵢ = Date(df[end, index]), Time(df[end, index])
+	if (lenᵢ₁ = Int((t₁ - tᵢ)/τ)) > 0
+		rl = repeat(df[[end], :]; inner=lenᵢ₁)
+		rl[:, index] = DateTime.(dᵢ, tᵢ+τ:τ:t₁)
+		rl
+	else
+		nothing
+	end
 end
 
 """
 $(TYPEDSIGNATURES)
-Repeat last row up to t₁
+Repeat last row up to t₁ as a DataFrame
 """
 function repeatlast(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_DT) where T<:TimeType
 	ttᵢ = T(df[end, index])
-	rl = repeat(df[[end], :]; inner=Int((tt₁ - ttᵢ)/τ))
-	rl[:, index] = DateTime.(tᵢ+τ:τ:t₁)
-	rl
+	if (lenᵢ₁ = Int((tt₁ - ttᵢ)/τ)) > 0
+		rl = repeat(df[[end], :]; inner=lenᵢ₁)
+		rl[:, index] = DateTime.(tᵢ+τ:τ:t₁)
+		rl
+	else
+		nothing
+	end
 end
 
 """
@@ -169,7 +177,8 @@ $(TYPEDSIGNATURES)
 Forward fill over Period `τ`
 """
 function ffill(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-	vcat(df, repeatlast(df, τ, tt₁; index=index))
+	ext = repeatlast(df, τ, tt₁; index=index)
+	isnothing(ext) ? df : vcat(df, ext)
 end
 
 """
@@ -177,7 +186,8 @@ $(TYPEDSIGNATURES)
 Forward fill over Period `τ` (in-place)
 """
 function ffill!(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-	append!(df, repeatlast(df, τ, tt₁; index=index))
+	ext = repeatlast(df, τ, tt₁; index=index)
+	isnothing(ext) ? df : append!(df, ext)
 end
 
 """
