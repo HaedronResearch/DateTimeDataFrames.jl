@@ -28,13 +28,15 @@ Last row of the given TimeType.
 $(TYPEDSIGNATURES)
 sub(interval)
 Select a DataFrame subinterval by time type condition.
-The `op` argument must be one of (`:∈`, `:<`, `:≤`, `:≥`, `:>`).
+The `op` argument must be one of (`:∈`, :∉, `:<`, `:≤`, `:≥`, `:>`).
 """
 function subset(df::AbstractDataFrame, op::Symbol, tt::Dates.TimeType; index::C=INDEX_DT)
 	r₀, r₁ = 1, nrow(df)
 	if op == :∈
 		r₀ = first(df, tt; index=index)
 		r₁ = last(df, tt; index=index)
+	elseif op == ∉
+		throw("unimplemented")
 	elseif op == :<
 		r₁ = first(df, tt; index=index)
 	elseif op == :≤
@@ -138,6 +140,37 @@ function lastunique(df::AbstractDataFrame; index::C=INDEX_DT)
 		end
 	end
 	df[1, :] # they're all the same
+end
+
+"""
+Repeat last row up to t₁
+"""
+function repeatlast(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
+	tᵢ = Time(df[end, index])
+	rl = repeat(df[[end], :]; inner=Int((t₁ - tᵢ)/τ))
+	rl[:, index] = DateTime.(Date(df[end, index]), tᵢ+τ:τ:t₁)
+	rl
+end
+
+function repeatlast(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_DT) where T<:TimeType
+	ttᵢ = T(df[end, index])
+	rl = repeat(df[[end], :]; inner=Int((tt₁ - ttᵢ)/τ))
+	rl[:, index] = DateTime.(tᵢ+τ:τ:t₁)
+	rl
+end
+
+"""
+Forward fill over Period `τ`
+"""
+function ffill(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
+	vcat(df, repeatlast(df, τ, tt₁; index=index))
+end
+
+"""
+Forward fill over Period `τ` (in-place)
+"""
+function ffill!(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
+	append!(df, repeatlast(df, τ, tt₁; index=index))
 end
 
 """
