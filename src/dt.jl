@@ -143,6 +143,7 @@ function lastunique(df::AbstractDataFrame; index::C=INDEX_DT)
 end
 
 """
+$(TYPEDSIGNATURES)
 Repeat last row up to t₁
 """
 function repeatlast(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
@@ -152,6 +153,10 @@ function repeatlast(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDE
 	rl
 end
 
+"""
+$(TYPEDSIGNATURES)
+Repeat last row up to t₁
+"""
 function repeatlast(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_DT) where T<:TimeType
 	ttᵢ = T(df[end, index])
 	rl = repeat(df[[end], :]; inner=Int((tt₁ - ttᵢ)/τ))
@@ -160,6 +165,7 @@ function repeatlast(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_
 end
 
 """
+$(TYPEDSIGNATURES)
 Forward fill over Period `τ`
 """
 function ffill(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
@@ -167,6 +173,7 @@ function ffill(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDE
 end
 
 """
+$(TYPEDSIGNATURES)
 Forward fill over Period `τ` (in-place)
 """
 function ffill!(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
