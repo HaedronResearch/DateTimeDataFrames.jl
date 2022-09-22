@@ -150,7 +150,7 @@ function repeatlast(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDE
 	dᵢ, tᵢ = Date(df[end, index]), Time(df[end, index])
 	if (lenᵢ₁ = Int((t₁ - tᵢ)/τ)) > 0
 		rl = repeat(df[[end], :]; inner=lenᵢ₁)
-		rl[:, index] = DateTime.(dᵢ, tᵢ+τ:τ:t₁)
+		rl[:, index] = Dates.DateTime.(dᵢ, tᵢ+τ:τ:t₁)
 		rl
 	else
 		nothing
@@ -165,7 +165,7 @@ function repeatlast(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_
 	ttᵢ = T(df[end, index])
 	if (lenᵢ₁ = Int((tt₁ - ttᵢ)/τ)) > 0
 		rl = repeat(df[[end], :]; inner=lenᵢ₁)
-		rl[:, index] = DateTime.(tᵢ+τ:τ:t₁)
+		rl[:, index] = Dates.DateTime.(tᵢ+τ:τ:t₁)
 		rl
 	else
 		nothing
