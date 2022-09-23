@@ -190,23 +190,23 @@ function expandindex(df::AbstractDataFrame, τ::Period; index::C=INDEX_DT)
 	expandindex(df, idx; index=index)
 end
 
-# """
-# $(TYPEDSIGNATURES)
-# Expand index to `t₁` with sampling period `τ`.
-# """
-# function expandindex(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
-# 	idx = df[1, index]:τ:Dates.DateTime(Date(df[end, index]), t₁)
-# 	expandindex(df, idx; index=index)
-# end
+"""
+$(TYPEDSIGNATURES)
+Expand index.
+"""
+function expandindex(df::AbstractDataFrame, τ::Period, interval::Pair{Time, Time}; index::C=INDEX_DT)
+	d₁, d₂ = Date(df[1, index]), Date(df[end, index])
+	idx = Dates.DateTime(d₁, interval[1]):τ:Dates.DateTime(d₂, interval[2])
+	expandindex(df, idx; index=index)
+end
 
-# """
-# $(TYPEDSIGNATURES)
-# Expand index to `tt₁` with sampling period `τ`.
-# """
-# function expandindex(df::AbstractDataFrame, τ::Period, tt₁::Time; index::C=INDEX_DT)
-# 	idx = df[1, index]:τ:tt₁
-# 	expandindex(df, idx; index=index)
-# end
+"""
+$(TYPEDSIGNATURES)
+Expand index.
+"""
+function expandindex(df::AbstractDataFrame, τ::Period, interval::Pair{TimeType, TimeType}; index::C=INDEX_DT)
+	expandindex(df, interval[1]:τ:interval[2]; index=index)
+end
 
 """
 $(TYPEDSIGNATURES)
@@ -240,13 +240,13 @@ function expand(df::AbstractDataFrame, τ::Period; index::C=INDEX_DT)
 	ffill!(expandindex(df, τ; index=index); index=index)
 end
 
-# """
-# $(TYPEDSIGNATURES)
-# Expand index `tt₁` and ffill non-index Missing values.
-# """
-# function expand(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-# 	ffill!(expandindex(df, τ, tt₁; index=index); index=index)
-# end
+"""
+$(TYPEDSIGNATURES)
+Expand index and ffill non-index Missing values.
+"""
+function expand(df::AbstractDataFrame, τ::Period, interval::Pair{TimeType, TimeType}; index::C=INDEX_DT)
+	ffill!(expandindex(df, τ, interval; index=index); index=index)
+end
 
 """
 $(TYPEDSIGNATURES)
