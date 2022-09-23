@@ -64,7 +64,7 @@ Select DataFrame subintervals within all `τ`aggregation periods.
 function subset(df::AbstractDataFrame, τ::Period, interval::Pair{Time, Time}; index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
 	select!(
 		subset(groupby(df, τ; index=index, col=col),
-			index => dt -> interval[1] .<= Time.(dt) .<= interval[2]
+			index => dt -> interval[1] .<= Time.(dt) .<= interval[2],
 			skipmissing=skipmissing, view=view, ungroup=ungroup),
 		Not(col)
 	)
