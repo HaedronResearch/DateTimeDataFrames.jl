@@ -54,7 +54,7 @@ $(TYPEDSIGNATURES)
 sub(interval)
 Select a DataFrame subinterval.
 """
-@inline subset(df::AbstractDataFrame, interval::Pair{TimeType, TimeType}; index::C=INDEX_DT) = subset(df, first(df, interval[1]; index=index), last(df, interval[2]; index=index))
+@inline subset(df::AbstractDataFrame, interval::Pair{T, T}; index::C=INDEX_DT) where T<:TimeType = subset(df, first(df, interval[1]; index=index), last(df, interval[2]; index=index))
 
 """
 $(TYPEDSIGNATURES)
