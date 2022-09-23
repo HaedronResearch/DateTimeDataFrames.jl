@@ -52,19 +52,19 @@ end
 """
 $(TYPEDSIGNATURES)
 sub(interval)
-Select a DataFrame subinterval [`tt₀`, `tt₁`].
+Select a DataFrame subinterval.
 """
-@inline subset(df::AbstractDataFrame, tt₀::Dates.TimeType, tt₁::Dates.TimeType; index::C=INDEX_DT) = subset(df, first(df, tt₀; index=index), last(df, tt₁; index=index))
+@inline subset(df::AbstractDataFrame, interval::Pair{TimeType, TimeType}; index::C=INDEX_DT) = subset(df, first(df, interval[1]; index=index), last(df, interval[2]; index=index))
 
 """
 $(TYPEDSIGNATURES)
 sub(interval)
-Select DataFrame subintervals in [`t₀`, `t₁`], within all `τ`aggregation periods.
+Select DataFrame subintervals within all `τ`aggregation periods.
 """
-function subset(df::AbstractDataFrame, t₀::Dates.Time, t₁::Dates.Time, τ::Period; index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
+function subset(df::AbstractDataFrame, τ::Period, interval::Pair{Time, Time}; index::C=INDEX_DT, col::CN=AGG_DT, skipmissing::Bool=false, view::Bool=false, ungroup::Bool=true)
 	select!(
 		subset(groupby(df, τ; index=index, col=col),
-			index => dt -> t₀ .<= Time.(dt) .<= t₁,
+			index => dt -> interval[1] .<= Time.(dt) .<= interval[2]
 			skipmissing=skipmissing, view=view, ungroup=ungroup),
 		Not(col)
 	)
