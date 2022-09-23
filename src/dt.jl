@@ -175,7 +175,7 @@ end
 
 """
 $(TYPEDSIGNATURES)
-Expand index to `idx
+Expand index.
 """
 @inline function expandindex(df::AbstractDataFrame, idx::AbstractVector{T}; index::C=INDEX_DT) where T<:TimeType
 	nrow(df) < size(idx, 1) ? sort!(outerjoin(DataFrame(index=>idx), df; on=index), index) : df
@@ -190,23 +190,23 @@ function expandindex(df::AbstractDataFrame, τ::Period; index::C=INDEX_DT)
 	expandindex(df, idx; index=index)
 end
 
-"""
-$(TYPEDSIGNATURES)
-Expand index to `t₁` with sampling period `τ`.
-"""
-function expandindex(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
-	idx = df[1, index]:τ:Dates.DateTime(Date(df[end, index]), t₁)
-	expandindex(df, idx; index=index)
-end
+# """
+# $(TYPEDSIGNATURES)
+# Expand index to `t₁` with sampling period `τ`.
+# """
+# function expandindex(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
+# 	idx = df[1, index]:τ:Dates.DateTime(Date(df[end, index]), t₁)
+# 	expandindex(df, idx; index=index)
+# end
 
-"""
-$(TYPEDSIGNATURES)
-Expand index to `tt₁` with sampling period `τ`.
-"""
-function expandindex(df::AbstractDataFrame, τ::Period, tt₁::Time; index::C=INDEX_DT)
-	idx = df[1, index]:τ:tt₁
-	expandindex(df, idx; index=index)
-end
+# """
+# $(TYPEDSIGNATURES)
+# Expand index to `tt₁` with sampling period `τ`.
+# """
+# function expandindex(df::AbstractDataFrame, τ::Period, tt₁::Time; index::C=INDEX_DT)
+# 	idx = df[1, index]:τ:tt₁
+# 	expandindex(df, idx; index=index)
+# end
 
 """
 $(TYPEDSIGNATURES)
@@ -226,28 +226,26 @@ end
 
 """
 $(TYPEDSIGNATURES)
-Expand index `t₁` and ffill non-index Missing values.
+Expand index and ffill non-index Missing values.
 """
-function expand(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-	ffill!(expandindex(df, τ, tt₁))
+function expand(df::AbstractDataFrame, idx::AbstractVector{T}; index::C=INDEX_DT) where T<:TimeType
+	ffill!(expandindex(df, idx; index=index); index=index)
+end
+
+"""
+$(TYPEDSIGNATURES)
+Expand within index by sampling period `τ` and ffill non-index Missing values.
+"""
+function expand(df::AbstractDataFrame, τ::Period; index::C=INDEX_DT)
+	ffill!(expandindex(df, τ; index=index); index=index)
 end
 
 # """
 # $(TYPEDSIGNATURES)
-# Forward fill over Period `τ` to `tt₁`
+# Expand index `tt₁` and ffill non-index Missing values.
 # """
-# function ffill(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-# 	ext = repeatlast(df, τ, tt₁; index=index)
-# 	isnothing(ext) ? df : vcat(df, ext)
-# end
-
-# """
-# $(TYPEDSIGNATURES)
-# Forward fill over Period `τ` to `tt₁` (in-place)
-# """
-# function ffill!(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-# 	ext = repeatlast(df, τ, tt₁; index=index)
-# 	isnothing(ext) ? df : append!(df, ext)
+# function expand(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
+# 	ffill!(expandindex(df, τ, tt₁; index=index); index=index)
 # end
 
 """
