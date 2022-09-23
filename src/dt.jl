@@ -204,7 +204,7 @@ end
 $(TYPEDSIGNATURES)
 Expand index.
 """
-function expandindex(df::AbstractDataFrame, τ::Period, interval::Pair{TimeType, TimeType}; index::C=INDEX_DT)
+function expandindex(df::AbstractDataFrame, τ::Period, interval::Pair{T, T}; index::C=INDEX_DT) where T<:TimeType
 	expandindex(df, interval[1]:τ:interval[2]; index=index)
 end
 
@@ -244,7 +244,7 @@ end
 $(TYPEDSIGNATURES)
 Expand index and ffill non-index Missing values.
 """
-function expand(df::AbstractDataFrame, τ::Period, interval::Pair{TimeType, TimeType}; index::C=INDEX_DT)
+function expand(df::AbstractDataFrame, τ::Period, interval::Pair{T, T}; index::C=INDEX_DT) where T<:TimeType
 	ffill!(expandindex(df, τ, interval; index=index); index=index)
 end
 
