@@ -175,28 +175,37 @@ end
 
 """
 $(TYPEDSIGNATURES)
-Expand index to `t₁`.
+Expand index to `idx
 """
-function expandindex(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
-	idx = df[1, index]:τ:Dates.DateTime(Date(df[end, index]), t₁)
-	if nrow(df) < size(idx, 1)
-		sort!(outerjoin(DataFrame(index=>idx), df; on=index), index)
-	else
-		df
-	end
+@inline function expandindex(df::AbstractDataFrame, idx::AbstractVector{T}; index::C=INDEX_DT) where T<:TimeType
+	nrow(df) < size(idx, 1) ? sort!(outerjoin(DataFrame(index=>idx), df; on=index), index) : df
 end
 
 """
 $(TYPEDSIGNATURES)
-Expand index to `tt₁`.
+Expand within index to sampling period `τ`.
 """
-function expandindex(df::AbstractDataFrame, τ::Period, tt₁::T; index::C=INDEX_DT) where T<:TimeType
+function expandindex(df::AbstractDataFrame, τ::Period; index::C=INDEX_DT)
+	idx = df[1, index]:τ:df[end, index]
+	expandindex(df, idx; index=index)
+end
+
+"""
+$(TYPEDSIGNATURES)
+Expand index to `t₁` with sampling period `τ`.
+"""
+function expandindex(df::AbstractDataFrame, τ::Period, t₁::Time; index::C=INDEX_DT)
+	idx = df[1, index]:τ:Dates.DateTime(Date(df[end, index]), t₁)
+	expandindex(df, idx; index=index)
+end
+
+"""
+$(TYPEDSIGNATURES)
+Expand index to `tt₁` with sampling period `τ`.
+"""
+function expandindex(df::AbstractDataFrame, τ::Period, tt₁::Time; index::C=INDEX_DT)
 	idx = df[1, index]:τ:tt₁
-	if nrow(df) < size(idx, 1)
-		sort!(outerjoin(DataFrame(index=>idx), df; on=index), index)
-	else
-		df
-	end
+	expandindex(df, idx; index=index)
 end
 
 """
@@ -228,12 +237,6 @@ end
 # Forward fill over Period `τ` to `tt₁`
 # """
 # function ffill(df::AbstractDataFrame, τ::Period, tt₁::TimeType; index::C=INDEX_DT)
-# 	# TODO ffill within the DataFrame
-# 	idx = df[1, index]:τ:df[end, index]
-# 	lenₛₑ = size(idx, 1)
-# 	if nrow(df) < lenₛₑ
-		
-# 	end
 # 	ext = repeatlast(df, τ, tt₁; index=index)
 # 	isnothing(ext) ? df : vcat(df, ext)
 # end
