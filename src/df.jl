@@ -12,9 +12,9 @@ $(TYPEDSIGNATURES)
 """
 $(TYPEDSIGNATURES)
 inr(ange)
-Decently fast StepRange boolean indexer.
+Decently fast set boolean indexer.
 """
-@inline inr(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF) = ∈(r).(df[:, index])
+@inline inr(df::AbstractDataFrame, r::Union{StepRange, AbstractVector}; index::C=INDEX_DF) = ∈(r).(df[:, index])
 
 """
 $(TYPEDSIGNATURES)
@@ -35,6 +35,7 @@ Select DataFrame subset.
 $(TYPEDSIGNATURES)
 sub(set)
 Select DataFrame subset by row or row number.
+TODO change input to Pair{Union{DataFrameRow, Integer}, Union{DataFrameRow, Integer}}
 """
 function subset(df::AbstractDataFrame, r₀::Union{DataFrameRow, Integer}, r₁::Union{DataFrameRow, Integer})
 	i₀ = r₀ isa DataFrameRow ? rownumber(r₀) : r₀
