@@ -14,15 +14,34 @@ end
 
 """
 $(TYPEDSIGNATURES)
+"""
+function intersect!(dfs::AbstractDataFrame...; index::C=INDEX_DT)
+	indices = [df[!, index] for df in dfs]
+	common = intersect(indices...)
+	[df[!, df[!, index].==common] for df in dfs]
+end
+
+"""
+$(TYPEDSIGNATURES)
 First row of the given TimeType.
 """
-@inline first(df::AbstractDataFrame, tt::T; index::C=INDEX_DT) where T<:Dates.TimeType = df[findfirst(dt->T(dt)==tt, df[:, index]), :]
+@inline first(df::AbstractDataFrame, tt::T; index::C=INDEX_DT) where T<:TimeType = df[findfirst(dt->T(dt)==tt, df[:, index]), :]
 
 """
 $(TYPEDSIGNATURES)
 Last row of the given TimeType.
 """
-@inline last(df::AbstractDataFrame, tt::T; index::C=INDEX_DT) where T<:Dates.TimeType = df[findlast(dt->T(dt)==tt, df[:, index]), :]
+@inline last(df::AbstractDataFrame, tt::T; index::C=INDEX_DT) where T<:TimeType = df[findlast(dt->T(dt)==tt, df[:, index]), :]
+
+"""
+$(TYPEDSIGNATURES)
+sub(set)
+Subset a DataFrame by a `TimeType` vector.
+"""
+function subset(df::AbstractDataFrame, t::AbstractVector{T}; index::C=INDEX_DT) where T<:TimeType
+	# df[∈.(df[!, index], Ref(v)), :] # alternate way
+	df[inr(df, t; index=index), :]
+end
 
 """
 $(TYPEDSIGNATURES)
@@ -30,7 +49,7 @@ sub(interval)
 Select a DataFrame subinterval by time type condition.
 The `op` argument must be one of (`:∈`, :∉, `:<`, `:≤`, `:≥`, `:>`).
 """
-function subset(df::AbstractDataFrame, op::Symbol, tt::Dates.TimeType; index::C=INDEX_DT)
+function subset(df::AbstractDataFrame, op::Symbol, tt::TimeType; index::C=INDEX_DT)
 	r₀, r₁ = 1, nrow(df)
 	if op == :∈
 		r₀ = first(df, tt; index=index)
@@ -48,6 +67,13 @@ function subset(df::AbstractDataFrame, op::Symbol, tt::Dates.TimeType; index::C=
 	end
 	subset(df, r₀, r₁)
 end
+
+"""
+$(TYPEDSIGNATURES)
+sub(interval)
+shorthand for `subset(df, :∈, tt)`
+"""
+@inline subset(df::AbstractDataFrame, tt::TimeType; index::C=INDEX_DT) = subset(df, :∈, tt; index=index)
 
 """
 $(TYPEDSIGNATURES)
@@ -195,7 +221,7 @@ $(TYPEDSIGNATURES)
 Expand index.
 """
 function expandindex(df::AbstractDataFrame, τ::Period, interval::Pair{Time, Time}; index::C=INDEX_DT)
-	d₁, d₂ = Date(df[1, index]), Date(df[end, index])
+	d₁, d₂ = Date(df[1, index]), Date(df[2, index])
 	idx = Dates.DateTime(d₁, interval[1]):τ:Dates.DateTime(d₂, interval[2])
 	expandindex(df, idx; index=index)
 end
