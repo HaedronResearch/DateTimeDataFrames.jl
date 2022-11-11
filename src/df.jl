@@ -50,6 +50,21 @@ Select DataFrame subrange by `index` column values in `r`.
 """
 @inline subset(df::AbstractDataFrame, r::StepRange; index::C=INDEX_DF) = subset(df, inr(df, r; index=index))
 
+# """
+# $(TYPEDSIGNATURES)
+# Get subset of df rows where df[!, key[1]] ∈ key[2]. Both vectors must be sorted.
+# The typical way to do this can be very slow if key[2] is large (O(m*n)).
+# This method takes advantage of both the column and key vectors being sorted to enable
+# a single pass through the column.. TODO
+# """
+# function subset(df::AbstractDataFrame, key::Pair{Symbol, AbstractVector{T}}) where T
+# 	col = df[!, key[1]]
+# 	indices = []
+# 	i = 1
+# 	for r in eachrow(col)
+# 	end
+# end
+
 """
 $(TYPEDSIGNATURES)
 Group by sequential subsets demarcated by true values.
@@ -83,6 +98,7 @@ function shift!(vec::AbstractVector{T}, s::Integer) where T
 end
 
 """
+$(TYPEDSIGNATURES)
 Forward fill / forward coalesce values
 """
 function ffill(xₜ::AbstractVector; default=missing)
@@ -91,6 +107,14 @@ function ffill(xₜ::AbstractVector; default=missing)
 		prev = xₜ[i] = coalesce(xᵢ, prev)
 	end
 	xₜ
+end
+
+"""
+$(TYPEDSIGNATURES)
+Back fill / backward coalesce values
+"""
+function bfill(xₜ::AbstractVector; default=missing)
+	reverse(ffil(reverse(xₜ); default=default))
 end
 
 """
