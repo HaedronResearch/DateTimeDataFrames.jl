@@ -114,7 +114,7 @@ $(TYPEDSIGNATURES)
 Back fill / backward coalesce values
 """
 function bfill(xₜ::AbstractVector; default=missing)
-	reverse(ffil(reverse(xₜ); default=default))
+	reverse(ffill(reverse(xₜ); default=default))
 end
 
 """
