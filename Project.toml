@@ -1,8 +1,8 @@
 name = "DateTimeDataFrames"
 uuid = "3a59f920-758d-4040-a4e5-4283a4939310"
 authors = ["kevindirect <git@kevindirect.com>"]
+license = "BSD-3-Clause"
 version = "0.3.0"
-license = "BSD-2-Clause"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
